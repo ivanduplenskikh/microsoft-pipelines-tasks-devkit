@@ -24,8 +24,8 @@ jobs:
       - name: Build the extension
         run: yarn package
 
-# Add integration tests here:
-# https://code.visualstudio.com/api/working-with-extensions/continuous-integration
+      - name: Test the extension
+        run: yarn test
 
 #      - name: Package the extension
 #        run: |
