@@ -1,0 +1,38 @@
+name: Build Extension
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build the extension
+        run: yarn package
+
+# Add integration tests here:
+# https://code.visualstudio.com/api/working-with-extensions/continuous-integration
+
+#      - name: Package the extension
+#        run: |
+#          yarn global add @vscode/vsce
+#          vsce package
+
+#      - name: Upload artifact
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: extension-package
+#          path: '*.vsix'
