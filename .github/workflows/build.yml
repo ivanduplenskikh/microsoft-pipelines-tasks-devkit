@@ -22,10 +22,15 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build the extension
-        run: yarn package
+        run: yarn compile
 
-# Add integration tests here:
-# https://code.visualstudio.com/api/working-with-extensions/continuous-integration
+      - name: Run test on Linux 
+        run: xvfb-run -a yarn test
+        if: runner.os == 'Linux'
+
+      - name: Run test on other OS
+        run: yarn test
+        if: runner.os != 'Linux'
 
 #      - name: Package the extension
 #        run: |
