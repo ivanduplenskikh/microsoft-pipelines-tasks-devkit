@@ -24,8 +24,13 @@ jobs:
       - name: Build the extension
         run: yarn compile
 
-      - name: Test the extension
+      - name: Run test on Linux 
+        run: xvfb-run -a yarn test
+        if: runner.os == 'Linux'
+
+      - name: Run test on other OS
         run: yarn test
+        if: runner.os != 'Linux'
 
 #      - name: Package the extension
 #        run: |
