@@ -22,7 +22,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build the extension
-        run: yarn package
+        run: yarn compile
 
       - name: Test the extension
         run: yarn test
