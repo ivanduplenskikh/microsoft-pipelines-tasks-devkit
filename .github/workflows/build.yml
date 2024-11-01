@@ -27,8 +27,6 @@ jobs:
       - name: Run test on Linux 
         run: xvfb-run -a yarn test
         if: runner.os == 'Linux'
-        env:
-          DBUS_SESSION_BUS_ADDRESS: "/dev/null"
 
       - name: Run test on other OS
         run: yarn test
