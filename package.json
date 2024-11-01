@@ -17,7 +17,7 @@
         {
           "id": "azurePipelines",
           "title": "Azure Pipelines",
-          "icon": "resources/azure-icon.png"
+          "icon": "$(azure-devops)"
         }
       ]
     },
@@ -52,8 +52,7 @@
         {
           "command": "azurePipelines.build",
           "when": "view == azurePipelinesTasksView",
-          "group": "navigation",
-          "alt": "Build"
+          "group": "navigation"
         },
         {
           "command": "azurePipelines.test",
