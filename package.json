@@ -25,11 +25,13 @@
       "tasksDevKit": [
         {
           "id": "tasksDevKit.tasks",
-          "name": "Tasks list"
+          "name": "Tasks list",
+          "type": "tree"
         },
         {
           "id": "tasksDevKit.settings",
-          "name": "Settings"
+          "name": "Settings",
+          "type": "tree"
         }
       ]
     },
@@ -60,22 +62,22 @@
         {
           "command": "azurePipelines.build",
           "when": "view == tasksDevKit.tasks",
-          "group": "navigation"
+          "group": "navigation@1"
         },
         {
           "command": "azurePipelines.debug",
           "when": "view == tasksDevKit.tasks",
-          "group": "navigation"
+          "group": "navigation@2"
         },
         {
           "command": "azurePipelines.test",
           "when": "view == tasksDevKit.tasks",
-          "group": "navigation"
+          "group": "navigation@3"
         },
         {
           "command": "azurePipelines.deploy",
           "when": "view == tasksDevKit.tasks",
-          "group": "navigation"
+          "group": "navigation@4"
         }
       ]
     }
