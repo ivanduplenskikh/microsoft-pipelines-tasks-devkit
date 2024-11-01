@@ -15,53 +15,66 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "azurePipelines",
-          "title": "Azure Pipelines",
+          "id": "tasksDevKit",
+          "title": "Tasks Dev Kit",
           "icon": "$(azure-devops)"
         }
       ]
     },
     "views": {
-      "azurePipelines": [
+      "tasksDevKit": [
         {
-          "id": "azurePipelinesTasksView",
-          "name": "Tasks"
+          "id": "tasksDevKit.tasks",
+          "name": "Tasks list"
+        },
+        {
+          "id": "tasksDevKit.settings",
+          "name": "Settings"
         }
       ]
     },
     "commands": [
       {
         "command": "azurePipelines.build",
-        "title": "Build Selected Tasks"
+        "title": "Build Selected Tasks",
+        "icon": "$(git-stash)"
+      },
+      {
+        "command": "azurePipelines.debug",
+        "title": "Debug Selected Tasks",
+        "icon": "$(debug-alt)"
       },
       {
         "command": "azurePipelines.test",
-        "title": "Test Selected Tasks"
+        "title": "Test Selected Tasks",
+        "icon": "$(beaker)"
       },
       {
         "command": "azurePipelines.deploy",
-        "title": "Deploy Selected Tasks"
-      },
-      {
-        "command": "azurePipelines.toggleTask",
-        "title": "Toggle Task Selection"
+        "title": "Deploy Selected Tasks",
+        "icon": "$(cloud-upload)"
       }
     ],
     "menus": {
       "view/title": [
         {
           "command": "azurePipelines.build",
-          "when": "view == azurePipelinesTasksView",
+          "when": "view == tasksDevKit.tasks",
+          "group": "navigation"
+        },
+        {
+          "command": "azurePipelines.debug",
+          "when": "view == tasksDevKit.tasks",
           "group": "navigation"
         },
         {
           "command": "azurePipelines.test",
-          "when": "view == azurePipelinesTasksView",
+          "when": "view == tasksDevKit.tasks",
           "group": "navigation"
         },
         {
           "command": "azurePipelines.deploy",
-          "when": "view == azurePipelinesTasksView",
+          "when": "view == tasksDevKit.tasks",
           "group": "navigation"
         }
       ]
