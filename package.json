@@ -12,12 +12,61 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "azurePipelines",
+          "title": "Azure Pipelines",
+          "icon": "resources/azure-icon.png"
+        }
+      ]
+    },
+    "views": {
+      "azurePipelines": [
+        {
+          "id": "azurePipelinesTasksView",
+          "name": "Tasks"
+        }
+      ]
+    },
     "commands": [
       {
-        "command": "microsoft-pipelines-tasks-devkit.helloWorld",
-        "title": "Hello World"
+        "command": "azurePipelines.build",
+        "title": "Build Selected Tasks"
+      },
+      {
+        "command": "azurePipelines.test",
+        "title": "Test Selected Tasks"
+      },
+      {
+        "command": "azurePipelines.deploy",
+        "title": "Deploy Selected Tasks"
+      },
+      {
+        "command": "azurePipelines.toggleTask",
+        "title": "Toggle Task Selection"
       }
-    ]
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "azurePipelines.build",
+          "when": "view == azurePipelinesTasksView",
+          "group": "navigation",
+          "alt": "Build"
+        },
+        {
+          "command": "azurePipelines.test",
+          "when": "view == azurePipelinesTasksView",
+          "group": "navigation"
+        },
+        {
+          "command": "azurePipelines.deploy",
+          "when": "view == azurePipelinesTasksView",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",
