@@ -35,47 +35,74 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "tasksDevKit.settings",
+        "contents": "In order to upload tasks to your organization, you need to be logged in TFX.\n[Login to TFX](command:tasksDevKit.tfx.login)",
+        "when": "tasksDevKit.tfx.signed-in === false"
+      }
+    ],
+    "configuration": {
+      "title": "Dev Kit Settings",
+      "properties": {
+        "tasksDevKit.adoOrgUrl": {
+          "type": "string",
+          "default": "https://dev.azure.com/your-organization",
+          "description": "Azure DevOps organization URL"
+        },
+        "tasksDevKit.adoPAT": {
+          "type": "string",
+          "default": "your-pat",
+          "description": "Azure DevOps Personal Access Token"
+        }
+      }
+    },
     "commands": [
       {
-        "command": "azurePipelines.build",
+        "command": "tasksDevKit.build",
         "title": "Build Selected Tasks",
         "icon": "$(git-stash)"
       },
       {
-        "command": "azurePipelines.debug",
+        "command": "tasksDevKit.debug",
         "title": "Debug Selected Tasks",
         "icon": "$(debug-alt)"
       },
       {
-        "command": "azurePipelines.test",
+        "command": "tasksDevKit.test",
         "title": "Test Selected Tasks",
         "icon": "$(beaker)"
       },
       {
-        "command": "azurePipelines.deploy",
+        "command": "tasksDevKit.deploy",
         "title": "Deploy Selected Tasks",
         "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "tasksDevKit.login",
+        "title": "Login to Azure DevOps",
+        "icon": "$(sign-in)"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "azurePipelines.build",
+          "command": "tasksDevKit.build",
           "when": "view == tasksDevKit.tasks",
           "group": "navigation@1"
         },
         {
-          "command": "azurePipelines.debug",
+          "command": "tasksDevKit.debug",
           "when": "view == tasksDevKit.tasks",
           "group": "navigation@2"
         },
         {
-          "command": "azurePipelines.test",
+          "command": "tasksDevKit.test",
           "when": "view == tasksDevKit.tasks",
           "group": "navigation@3"
         },
         {
-          "command": "azurePipelines.deploy",
+          "command": "tasksDevKit.deploy",
           "when": "view == tasksDevKit.tasks",
           "group": "navigation@4"
         }

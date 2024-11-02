@@ -73,7 +73,7 @@ export class TaskItem extends vscode.TreeItem {
     this.updateIcon();
 
     this.command = {
-      command: 'azurePipelines.toggleTask',
+      command: 'tasksDevKit.toggleTask',
       title: 'Toggle Task Selection',
       arguments: [this]
     };

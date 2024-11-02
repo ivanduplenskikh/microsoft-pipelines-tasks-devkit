@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
   const rootPath = workspaceFolders[0].uri.fsPath;
   const tasksProvider = new TasksProvider(rootPath);
   vscode.window.registerTreeDataProvider(
-    "azurePipelinesTasksView",
+    "tasksDevKit.tasks",
     tasksProvider
   );
 
@@ -31,21 +31,21 @@ export function activate(context: vscode.ExtensionContext) {
   // Register the commands
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      "azurePipelines.toggleTask",
+      "tasksDevKit.toggleTask",
       (taskItem: TaskItem) => {
         tasksProvider.toggleTaskSelection(taskItem);
       }
     ),
 
-    vscode.commands.registerCommand("azurePipelines.build", () => {
+    vscode.commands.registerCommand("tasksDevKit.build", () => {
       executeTasks("build", tasksProvider.getSelectedTasks());
     }),
 
-    vscode.commands.registerCommand("azurePipelines.test", () => {
+    vscode.commands.registerCommand("tasksDevKit.test", () => {
       executeTasks("test", tasksProvider.getSelectedTasks());
     }),
 
-    vscode.commands.registerCommand("azurePipelines.deploy", () => {
+    vscode.commands.registerCommand("tasksDevKit.deploy", () => {
       executeTasks("deploy", tasksProvider.getSelectedTasks());
     })
   );
