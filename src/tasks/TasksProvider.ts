@@ -3,12 +3,22 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 export class TasksProvider implements vscode.TreeDataProvider<TaskItem> {
+  private workspaceRoot: string = '';
+
   private _onDidChangeTreeData = new vscode.EventEmitter<TaskItem | undefined>();
   readonly onDidChangeTreeData: vscode.Event<TaskItem | undefined> = this._onDidChangeTreeData.event;
 
   private tasksMap: Map<string, TaskItem> = new Map();
 
-  constructor(private workspaceRoot: string) {
+  constructor() {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders) {
+      vscode.window.showInformationMessage('No workspace folder open.');
+      return;
+    }
+
+    const rootPath = workspaceFolders[0].uri.fsPath;
+    this.workspaceRoot = rootPath;
     this.refresh();
   }
 
