@@ -38,25 +38,21 @@
     "viewsWelcome": [
       {
         "view": "tasksDevKit.settings",
-        "contents": "In order to upload tasks to your organization, you need to be logged in TFX.\n[Login to TFX](command:tasksDevKit.tfx.login)",
+        "contents": "In order to upload tasks to your organization, you need to be logged in TFX.\n[Login to TFX](command:tasksDevKit.login)",
         "when": "tasksDevKit.tfx.signed-in === false"
+      },
+      {
+        "view": "tasksDevKit.settings",
+        "contents": "You are logged in to Azure DevOps.\n[Logout](command:tasksDevKit.logout)",
+        "when": "tasksDevKit.tfx.signed-in === true"
       }
     ],
-    "configuration": {
-      "title": "Dev Kit Settings",
-      "properties": {
-        "tasksDevKit.adoOrgUrl": {
-          "type": "string",
-          "default": "https://dev.azure.com/your-organization",
-          "description": "Azure DevOps organization URL"
-        },
-        "tasksDevKit.adoPAT": {
-          "type": "string",
-          "default": "your-pat",
-          "description": "Azure DevOps Personal Access Token"
-        }
+    "authentication": [
+      {
+        "id": "azuredevopspat",
+        "label": "Azure DevOps PAT"
       }
-    },
+    ],
     "commands": [
       {
         "command": "tasksDevKit.build",
@@ -82,6 +78,11 @@
         "command": "tasksDevKit.login",
         "title": "Login to Azure DevOps",
         "icon": "$(sign-in)"
+      },
+      {
+        "command": "tasksDevKit.logout",
+        "title": "Logout from Azure DevOps",
+        "icon": "$(sign-out)"
       }
     ],
     "menus": {

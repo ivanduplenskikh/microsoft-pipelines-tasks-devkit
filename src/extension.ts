@@ -1,7 +1,43 @@
 import * as vscode from 'vscode';
 import { TaskItem, TasksProvider } from './Provider/TasksProvider';
+import { AzureDevOpsAuthenticationProvider } from './authentication/AzureDevOps/AzureDevOpsAuthenticationProvider';
 
 export function activate(context: vscode.ExtensionContext) {
+  // Auth
+  const authProvider = new AzureDevOpsAuthenticationProvider(context.secrets);
+  context.subscriptions.push(
+    vscode.authentication.registerAuthenticationProvider(
+      AzureDevOpsAuthenticationProvider.id,
+      'Azure DevOps PAT',
+      authProvider,
+      { supportsMultipleAccounts: false },
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('tasksDevKit.login', async () => {
+      try {
+        await vscode.authentication.getSession(AzureDevOpsAuthenticationProvider.id, [], { createIfNone: true });
+        vscode.window.showInformationMessage('Successfully logged in to Azure DevOps.');
+      } catch (e: any) {
+        vscode.window.showErrorMessage(`Login failed: ${e.message}`);
+      }
+    }),
+
+    vscode.commands.registerCommand('tasksDevKit.logout', async () => {
+      const session = await vscode.authentication.getSession(AzureDevOpsAuthenticationProvider.id, [], {
+        createIfNone: false,
+      });
+
+      if (session === undefined) {
+        vscode.window.showInformationMessage('You are not logged in.');
+      } else {
+        await authProvider.removeSession(session.id);
+        vscode.window.showInformationMessage('Successfully logged out of Azure DevOps.');
+      }
+    }),
+  );
+
   const workspaceFolders = vscode.workspace.workspaceFolders;
   if (!workspaceFolders) {
     vscode.window.showInformationMessage('No workspace folder open.');
