@@ -39,19 +39,28 @@ export class TasksModule {
       return;
     }
 
-    const terminal = vscode.window.createTerminal('Azure Pipelines');
+    const terminal = vscode.window.activeTerminal ?? vscode.window.createTerminal('Azure Pipelines');
+    // Build the command sequence
 
     selectedTasks.forEach((task) => {
+      let commandSequence = `cd Tasks/${task} && npm install && cd.. && cd..`;
+      terminal.sendText(commandSequence);
+
       switch (action) {
         case 'build':
-          terminal.sendText(`Executing node make.js build --task ${task}`, false);
+          // terminal.sendText(`✅ Building task: ${task}\n`, false);
+          terminal.sendText(`node make.js build --task ${task}`);
           break;
         case 'test':
-          terminal.sendText(`Executing node make.js test --task ${task}`, false);
+          // terminal.sendText(`🧪 Testing task: ${task}\n`, false);
+          terminal.sendText(`node make.js test --task ${task}`);
           break;
         case 'deploy':
-          terminal.sendText(`Executing node make.js build --task ${task}`, false);
-          terminal.sendText(`Executing tfx build tasks upload --task-path ./_build/Tasks/${task}`, false);
+          // terminal.sendText(`🚀 Deploying task: ${task}\n`, false);
+          // terminal.sendText(`Executing node make.js build --task ${task}`, false);
+          
+          terminal.sendText(`tfx build tasks delete --task-id 7B5A6198-ADF8-4B16-9939-7ADDF85708B2`);
+          terminal.sendText(`tfx build tasks upload --task-path ./_build/Tasks/${task}`);
           break;
       }
     });
