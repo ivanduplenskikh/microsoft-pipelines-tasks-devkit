@@ -9,12 +9,12 @@ env:
   # ref_name is the tag, specified in the release.
   # Tag must contain the version of the extension. Ex: '1.0.0'
 
-permissions:
-  contents: write  # Grants permission to upload release assets
-
 jobs:
   publish:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write # Permissions to attcach the artifact to release assets.
 
     steps:
       - name: Check out code
