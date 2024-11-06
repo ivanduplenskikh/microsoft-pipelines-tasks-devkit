@@ -43,12 +43,13 @@ jobs:
           yarn global add @vscode/vsce
           vsce package
 
-      - name: Upload release binaries
-        uses: alexellis/upload-assets@0.4.1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
         with:
-          asset_paths: '*.vsix'
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: "*.vsix"
+          asset_name: ${{ env.extension-name }}
+          asset_content_type: application/octet-stream
 
       - name: Publish Extension
         run: vsce publish --packagePath *.vsix
