@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import { TaskItem, TasksProvider } from './TasksProvider';
+import { TasksProvider } from './TasksProvider';
+import { TaskItem } from './TaskItem';
 
 export class TasksModule {
   readonly tasksProvider: TasksProvider;
@@ -58,7 +59,7 @@ export class TasksModule {
         case 'deploy':
           // terminal.sendText(`🚀 Deploying task: ${task}\n`, false);
           // terminal.sendText(`Executing node make.js build --task ${task}`, false);
-          
+
           terminal.sendText(`tfx build tasks delete --task-id 7B5A6198-ADF8-4B16-9939-7ADDF85708B2`);
           terminal.sendText(`tfx build tasks upload --task-path ./_build/Tasks/${task}`);
           break;

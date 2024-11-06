@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import { TaskItem } from './TaskItem';
 
 export class TasksProvider implements vscode.TreeDataProvider<TaskItem> {
   private workspaceRoot: string = '';
@@ -67,25 +68,5 @@ export class TasksProvider implements vscode.TreeDataProvider<TaskItem> {
     return Array.from(this.tasksMap.values())
       .filter((taskItem) => taskItem.checked)
       .map((taskItem) => taskItem.label);
-  }
-}
-
-export class TaskItem extends vscode.TreeItem {
-  public checked: boolean = false;
-
-  constructor(public readonly label: string) {
-    super(label, vscode.TreeItemCollapsibleState.None);
-    this.contextValue = 'taskItem';
-    this.updateIcon();
-
-    this.command = {
-      command: 'tasksDevKit.toggleTask',
-      title: 'Toggle Task Selection',
-      arguments: [this],
-    };
-  }
-
-  updateIcon(): void {
-    this.iconPath = new vscode.ThemeIcon(this.checked ? 'check' : 'circle-large-outline');
   }
 }

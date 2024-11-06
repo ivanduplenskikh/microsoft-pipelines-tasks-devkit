@@ -1,11 +1,30 @@
 {
-  "name": "microsoft-pipelines-tasks-devkit",
-  "displayName": "microsoft-pipelines-tasks-devkit",
+  "name": "pipelines-tasks-devkit",
+  "displayName": "Microsoft Pipelines Tasks Dev Kit",
   "description": "Dev Kit for Microsoft pipelines tasks: Azure DevOps + GitHub",
   "version": "0.0.1",
+  "publisher": "vhorbachov",
   "engines": {
     "vscode": "^1.95.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LeftTwixWand/microsoft-pipelines-tasks-devkit"
+  },
+  "license": "MIT",
+  "icon": "assets/azure-devops.png",
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
+  },
+  "keywords": [
+    "pipelines",
+    "Azure DevOps",
+    "tasks",
+    "Azure",
+    "DevOps"
+  ],
+  "homepage": "https://github.com/LeftTwixWand/microsoft-pipelines-tasks-devkit",
   "categories": [
     "Other"
   ],
