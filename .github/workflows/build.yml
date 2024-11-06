@@ -2,7 +2,6 @@ name: Build Extension
 
 on:
   workflow_dispatch:
-  workflow_call:
   push:
     branches: [master]
   pull_request:
@@ -32,16 +31,3 @@ jobs:
       - name: Run test on other OS
         run: yarn test
         if: runner.os != 'Linux'
-
-      - name: Package the extension
-        if: ${{ github.event_name == 'workflow_call' }}
-        run: |
-          yarn global add @vscode/vsce
-          vsce package
-
-      - name: Upload artifact
-        if: ${{ github.event_name == 'workflow_call' }}
-        uses: actions/upload-artifact@v3
-        with:
-         name: extension-package
-         path: '*.vsix'
