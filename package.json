@@ -1,9 +1,9 @@
 {
   "name": "pipelines-tasks-devkit",
   "displayName": "Microsoft Pipelines Tasks Dev Kit",
-  "description": "Dev Kit for Microsoft pipelines tasks: Azure DevOps + GitHub",
-  "version": "0.0.1",
-  "publisher": "vhorbachov",
+  "description": "Dev Kit for Azure DevOps pipelines tasks",
+  "version": "0.0.2",
+  "publisher": "VladHorbachov",
   "engines": {
     "vscode": "^1.95.0"
   },
