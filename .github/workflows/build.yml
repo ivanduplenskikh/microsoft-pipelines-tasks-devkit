@@ -33,13 +33,15 @@ jobs:
         run: yarn test
         if: runner.os != 'Linux'
 
-#      - name: Package the extension
-#        run: |
-#          yarn global add @vscode/vsce
-#          vsce package
+      - name: Package the extension
+        if: ${{ github.event_name == 'workflow_call' }}
+        run: |
+          yarn global add @vscode/vsce
+          vsce package
 
-#      - name: Upload artifact
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: extension-package
-#          path: '*.vsix'
+      - name: Upload artifact
+        if: ${{ github.event_name == 'workflow_call' }}
+        uses: actions/upload-artifact@v3
+        with:
+         name: extension-package
+         path: '*.vsix'
