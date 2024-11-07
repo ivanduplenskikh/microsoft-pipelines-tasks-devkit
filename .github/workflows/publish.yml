@@ -40,10 +40,17 @@ jobs:
           yarn global add @vscode/vsce
           vsce package
 
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
+      - name: Get asset upload URL
+        id: get_release
+        uses: bruceadams/get-release@v1.3.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Upload Extension as Release Asset
+        uses: shogo82148/actions-upload-release-asset@v1
         with:
-          upload_url: ${{ github.event.release.upload_url }}
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: ./${{ env.extension-name }}
           asset_name: ${{ env.extension-name }}
           asset_content_type: application/octet-stream
 
