@@ -14,9 +14,6 @@ jobs:
   publish:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write # Permissions to attcach the artifact to release assets.
-
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -52,6 +49,6 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Publish Extension
-        run: vsce publish --packagePath *.vsix
+        run: vsce publish
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
