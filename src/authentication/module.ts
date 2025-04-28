@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+
 import { AzureDevOpsAuthenticationProvider } from './AzureDevOps/AzureDevOpsAuthenticationProvider';
 
 export class AuthenticationModule {

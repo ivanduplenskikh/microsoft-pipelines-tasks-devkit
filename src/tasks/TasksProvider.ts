@@ -1,6 +1,8 @@
+import * as path from 'node:path';
+import * as fs from 'node:fs';
+
 import * as vscode from 'vscode';
-import * as path from 'path';
-import * as fs from 'fs';
+
 import { TaskItem } from './TaskItem';
 
 export class TasksProvider implements vscode.TreeDataProvider<TaskItem> {
