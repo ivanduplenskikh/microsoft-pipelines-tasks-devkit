@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+
 import { AuthenticationModule } from './authentication/module';
 import { TasksModule } from './tasks/module';
 

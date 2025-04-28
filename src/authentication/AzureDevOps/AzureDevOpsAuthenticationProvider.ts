@@ -1,4 +1,3 @@
-import { AzureDevOpsPatSession } from './AzureDevOpsPatSession';
 import {
   AuthenticationProvider,
   AuthenticationProviderAuthenticationSessionsChangeEvent,
@@ -10,6 +9,8 @@ import {
   commands,
   window,
 } from 'vscode';
+
+import { AzureDevOpsPatSession } from './AzureDevOpsPatSession';
 
 export class AzureDevOpsAuthenticationProvider implements AuthenticationProvider, Disposable {
   static id = 'azuredevopspat';

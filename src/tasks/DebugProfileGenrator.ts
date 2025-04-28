@@ -1,6 +1,7 @@
-import path from 'path';
+import * as fs from 'node:fs';
+import path from 'node:path';
+
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 
 export class DebugProfilesGenerator {
   static generateDebugProfiles(selectedTasks: string[]): void {
@@ -8,22 +9,22 @@ export class DebugProfilesGenerator {
       vscode.window.showInformationMessage('No tasks selected.');
       return;
     }
-  
+
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (!workspaceFolders) {
       vscode.window.showErrorMessage('No workspace folder open.');
       return;
     }
-  
+
     const launchConfigPath = path.join(workspaceFolders[0].uri.fsPath, '.vscode', 'launch.json');
     let launchConfig: any = { version: '0.2.0', configurations: [] };
-  
+
     // Read existing launch.json if it exists
     if (fs.existsSync(launchConfigPath)) {
       const launchConfigContent = fs.readFileSync(launchConfigPath, 'utf-8');
       launchConfig = JSON.parse(launchConfigContent);
     }
-  
+
     selectedTasks.forEach((taskName) => {
       const debugConfig = {
         name: `Debug ${taskName}`,
@@ -34,20 +35,20 @@ export class DebugProfilesGenerator {
         program: '${workspaceFolder}/Tasks/' + taskName + '/main.ts',
         envFile: '${workspaceFolder}/Tasks/' + taskName + '/.env',
         cwd: '${workspaceFolder}/Tasks/' + taskName,
-      };      
+      };
 
       // Avoid duplicate configurations
       if (!launchConfig.configurations.find((config: any) => config.name === debugConfig.name)) {
         launchConfig.configurations.push(debugConfig);
       }
     });
-  
+
     // Ensure .vscode directory exists
     const vscodeDir = path.dirname(launchConfigPath);
     if (!fs.existsSync(vscodeDir)) {
       fs.mkdirSync(vscodeDir);
     }
-  
+
     // Write updated launch.json
     fs.writeFileSync(launchConfigPath, JSON.stringify(launchConfig, null, 2), 'utf-8');
     vscode.window.showInformationMessage('Debug profiles generated successfully.');
