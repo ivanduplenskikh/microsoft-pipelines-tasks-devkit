@@ -1,9 +1,10 @@
+import { existsSync, lstatSync, rmSync, symlinkSync } from 'node:fs';
+import { join } from 'node:path';
+
 import vscode from 'vscode';
 
 import { TasksProvider } from './TasksProvider';
 import { TaskItem } from './TaskItem';
-import { existsSync, lstatSync, rmSync, symlinkSync } from 'node:fs';
-import { join } from 'node:path';
 
 export class TasksModule {
   readonly tasksProvider: TasksProvider;
