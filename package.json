@@ -150,6 +150,7 @@
   },
   "dependencies": {
     "azure-devops-node-api": "^14.1.0",
+    "undici": "^7.10.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {
