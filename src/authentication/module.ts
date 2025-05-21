@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 
-import { AzureDevOpsAuthenticationProvider } from './AzureDevOps/AzureDevOpsAuthenticationProvider';
 import { AzureDevOpsOAuthProvider } from './AzureDevOps/AzureDevOpsOAuthProvider';
 
 export class AuthenticationModule {
@@ -27,7 +26,7 @@ export class AuthenticationModule {
         await vscode.authentication.getSession(AzureDevOpsOAuthProvider.id, [], { createIfNone: true });
         vscode.window.showInformationMessage('Successfully logged in to Azure DevOps.');
       } catch (e: any) {
-        vscode.window.showErrorMessage(`OAuth login failed: ${e.message}. Falling back to PAT login.`);
+        vscode.window.showErrorMessage(`OAuth login failed: ${e.message}.`);
       }
     });
   }
