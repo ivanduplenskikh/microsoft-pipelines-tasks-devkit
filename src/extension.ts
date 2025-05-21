@@ -1,17 +1,20 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 
 import { AuthenticationModule } from './authentication/module';
 import { TasksModule } from './tasks/module';
 
-export function activate(context: vscode.ExtensionContext) {
-  const authenticationModule = new AuthenticationModule(context);
-  const tasksModule = new TasksModule(context);
+export async function activate(context: vscode.ExtensionContext) {
+  new AuthenticationModule(context);
+  new TasksModule(context),
 
-  context.subscriptions.push(
-    ...authenticationModule.registerAuthenticationProvider(),
-    authenticationModule.registerLoginCommand(),
-    authenticationModule.registerLogoutCommand(),
-    ...tasksModule.registerCommands(),
+  vscode.commands.registerCommand(
+    'aptd.openSettings',
+    () => vscode.commands.executeCommand('setContext', 'aptd.isCompleted', false)
+  );
+
+  vscode.commands.registerCommand(
+    'aptd.letsGo',
+    () => vscode.commands.executeCommand('setContext', 'aptd.isCompleted', true)
   );
 
   console.log('Congratulations, your extension "microsoft-pipelines-tasks-devkit" is now active!');

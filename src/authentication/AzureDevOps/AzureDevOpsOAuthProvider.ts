@@ -21,7 +21,7 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
   private currentSession: OAuthSessionData | undefined;
   private disposables: vscode.Disposable[] = [];
 
-  constructor(private readonly secretStorage: vscode.SecretStorage) {
+  constructor(private readonly context: vscode.ExtensionContext) {
     this.initialize();
   }
 
@@ -35,10 +35,10 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
 
   private async initialize() {
     this.currentSession = await this.getStoredSession();
-    await vscode.commands.executeCommand('setContext', 'tasksDevKit.tfx.signed-in', !!this.currentSession);
+    await vscode.commands.executeCommand('setContext', 'aptd.isAuthorized', !!this.currentSession);
 
     this.disposables.push(
-      this.secretStorage.onDidChange(async (e) => {
+      this.context.secrets.onDidChange(async (e) => {
         if (e.key === AzureDevOpsOAuthProvider.secretKey) {
           await this.updateSessions();
         }
@@ -47,7 +47,7 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
   }
 
   private async getStoredSession(): Promise<OAuthSessionData | undefined> {
-    const data = await this.secretStorage.get(AzureDevOpsOAuthProvider.secretKey);
+    const data = await this.context.secrets.get(AzureDevOpsOAuthProvider.secretKey);
     if (data) {
       try {
         return JSON.parse(data) as OAuthSessionData;
@@ -62,8 +62,8 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
     const previousSession = this.currentSession;
     this.currentSession = await this.getStoredSession();
 
-    await vscode.commands.executeCommand('setContext', 'tasksDevKit.tfx.signed-in', !!this.currentSession);
-
+    await vscode.commands.executeCommand('setContext', 'aptd.isAuthorized', !!this.currentSession);
+    console.log(this.currentSession)
     const added: vscode.AuthenticationSession[] = [];
     const removed: vscode.AuthenticationSession[] = [];
 
@@ -74,6 +74,105 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
     }
 
     this._onDidChangeSessions.fire({ added, removed, changed: [] });
+  }
+
+  private async loadOrganizations(accessToken: string, publicAlias: string): Promise<AzureDevOps.Organizations> {
+    return new Promise(async (resolve) => {
+      if (this.context.workspaceState.get<AzureDevOps.Organizations>('organizations')) {
+        resolve(this.context.workspaceState.get<AzureDevOps.Organizations>('organizations')!);
+        return;
+      }
+
+      await vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: "Fetching your Azure DevOps organizations...",
+        cancellable: false,
+      },
+      async () => {
+        const organizations = await AzureDevOpsApiClient.getUserOrganizations(accessToken, publicAlias);
+        this.context.workspaceState.update('organizations', organizations);
+        resolve(organizations);
+      });
+    });
+  }
+
+  private async promptOrganization(accessToken: string): Promise<AzureDevOps.Organization | undefined> {
+    const userProfile = await AzureDevOpsApiClient.getUserProfile(accessToken);
+    let organizations = await this.loadOrganizations(accessToken, userProfile.coreAttributes.PublicAlias.value);
+    const quickPick = await vscode.window.showQuickPick([
+      {
+        label: '',
+        kind: vscode.QuickPickItemKind.Separator,
+      },
+      ...organizations.ownerOrganizations.map(x => ({
+        label: x.accountName,
+      })),
+      {
+        label: '',
+        kind: vscode.QuickPickItemKind.Separator,
+      },
+      ...organizations.memberOrgs.map(x => ({
+        label: x.accountName,
+      }))
+    ], { placeHolder: 'Select your Azure DevOps organization' });
+
+    if (!quickPick) {
+      throw new Error('No organization selected');
+    }
+
+    return [...organizations.memberOrgs, ...organizations.ownerOrganizations].find(x => x.accountName === quickPick.label);
+  }
+
+  private async authorize(msSession: vscode.AuthenticationSession) {
+    const organization = await this.promptOrganization(msSession.accessToken);
+
+    if (!organization) {
+      throw new Error('Organization is required for authentication');
+    }
+
+    // Use the token to authenticate with Azure DevOps
+    const connection = new azdev.WebApi(
+      `https://dev.azure.com/${organization.accountName}`,
+      azdev.getBearerHandler(msSession.accessToken)
+    );
+
+    try {
+      const coreApi = await connection.getCoreApi();
+      const userInfo = await coreApi.getIdentityMru('me');
+
+      if (!userInfo) {
+        throw new Error('Failed to get user information from Azure DevOps');
+      }
+
+      // Store the session
+      const sessionData: OAuthSessionData = {
+        accessToken: msSession.accessToken,
+        organization: organization.accountName,
+        userId: userInfo[0].id
+      };
+
+      await this.context.secrets.store(AzureDevOpsOAuthProvider.secretKey, JSON.stringify(sessionData));
+      this.currentSession = sessionData;
+      await vscode.commands.executeCommand('setContext', 'aptd.isAuthorized', true);
+      const session = new AzureDevOpsOAuthSession(msSession.accessToken, organization.accountName, userInfo[0].id);
+      this._onDidChangeSessions.fire({ added: [session], removed: [], changed: [] });
+      return session;
+    } catch (error) {
+      console.error('Failed to connect to Azure DevOps:', error);
+
+      // If organization is invalid, suggest visiting Azure DevOps portal
+      const openPortal = 'Open Azure DevOps Portal';
+      const result = await vscode.window.showErrorMessage(
+        `Failed to connect to organization "${organization}". Please check if it exists and you have access to it.`,
+        openPortal
+      );
+
+      if (result === openPortal) {
+        await vscode.env.openExternal(vscode.Uri.parse('https://dev.azure.com'));
+      }
+
+      throw new Error(`Failed to connect to Azure DevOps: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   /**
@@ -87,92 +186,8 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
         createIfNone: true
       });
 
-      const userProfile = await AzureDevOpsApiClient.getUserProfile(msSession.accessToken);
-      let organization: AzureDevOps.Organization | undefined;
-
-      await vscode.window.withProgress({
-        location: vscode.ProgressLocation.Notification,
-        title: "Fetching your Azure DevOps organizations...",
-        cancellable: false,
-      },
-      async () => {
-        const organizations = await AzureDevOpsApiClient.getUserOrganizations(msSession.accessToken, userProfile.coreAttributes.PublicAlias.value);
-        const quickPick = await vscode.window.showQuickPick([
-          {
-            label: '',
-            kind: vscode.QuickPickItemKind.Separator,
-          },
-          ...organizations.ownerOrganizations.map(org => ({
-            label: org.accountName,
-          })),
-          {
-            label: '',
-            kind: vscode.QuickPickItemKind.Separator,
-          },
-          ...organizations.memberOrgs.map(org => ({
-            label: org.accountName,
-          }))
-        ], { placeHolder: 'Select your Azure DevOps organization' });
-
-        if (!quickPick) {
-          throw new Error('No organization selected');
-        }
-
-        console.log(organizations);
-
-        organization = [...organizations.memberOrgs, ...organizations.ownerOrganizations].find(x => x.accountName === quickPick.label);
-      });
-
-      if (!organization) {
-        throw new Error('Organization is required for authentication');
-      }
-
-      // Use the token to authenticate with Azure DevOps
-      const connection = new azdev.WebApi(
-        `https://dev.azure.com/${organization.accountName}`,
-        azdev.getBearerHandler(msSession.accessToken)
-      );
-
-      try {
-        const coreApi = await connection.getCoreApi();
-        const userInfo = await coreApi.getIdentityMru('me');
-
-        if (!userInfo) {
-          throw new Error('Failed to get user information from Azure DevOps');
-        }
-
-        // Store the session
-        const sessionData: OAuthSessionData = {
-          accessToken: msSession.accessToken,
-          organization: organization.accountName,
-          userId: userInfo[0].id
-        };
-
-        await this.secretStorage.store(AzureDevOpsOAuthProvider.secretKey, JSON.stringify(sessionData));
-        this.currentSession = sessionData;
-
-        await vscode.commands.executeCommand('setContext', 'tasksDevKit.tfx.signed-in', true);
-
-        const session = new AzureDevOpsOAuthSession(msSession.accessToken, organization.accountName, userInfo[0].id);
-        this._onDidChangeSessions.fire({ added: [session], removed: [], changed: [] });
-
-        return session;
-      } catch (error) {
-        console.error('Failed to connect to Azure DevOps:', error);
-
-        // If organization is invalid, suggest visiting Azure DevOps portal
-        const openPortal = 'Open Azure DevOps Portal';
-        const result = await vscode.window.showErrorMessage(
-          `Failed to connect to organization "${organization}". Please check if it exists and you have access to it.`,
-          openPortal
-        );
-
-        if (result === openPortal) {
-          await vscode.env.openExternal(vscode.Uri.parse('https://dev.azure.com'));
-        }
-
-        throw new Error(`Failed to connect to Azure DevOps: ${error instanceof Error ? error.message : String(error)}`);
-      }
+      this.authorize(msSession);
+      return msSession;
     } catch (error) {
       if (error instanceof Error) {
         throw error;
@@ -181,13 +196,25 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
     }
   }
 
-  async removeSession(sessionId: string): Promise<void> {
-    await this.secretStorage.delete(AzureDevOpsOAuthProvider.secretKey);
+  async switchOrganization(): Promise<void> {
+    this.createSession([], {});
+  }
+
+  async removeSession(): Promise<void> {
+    const session = await vscode.authentication.getSession(AzureDevOpsOAuthProvider.id, [], {
+      createIfNone: false,
+    });
+
+    if (!session) {
+      console.warn('No session found to remove');
+      await vscode.commands.executeCommand('setContext', 'aptd.isAuthorized', false);
+      return;
+    }
+
+    await this.context.secrets.delete(AzureDevOpsOAuthProvider.secretKey);
 
     const previousSession = this.currentSession;
     this.currentSession = undefined;
-
-    await vscode.commands.executeCommand('setContext', 'tasksDevKit.tfx.signed-in', false);
 
     if (previousSession) {
       const session = new AzureDevOpsOAuthSession(
@@ -197,6 +224,10 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
       );
       this._onDidChangeSessions.fire({ added: [], removed: [session], changed: [] });
     }
+
+    this.context.workspaceState.update('organizations', undefined);
+    console.warn('Logged out of Azure DevOps');
+    await vscode.commands.executeCommand('setContext', 'aptd.isAuthorized', false);
   }
 
   dispose() {

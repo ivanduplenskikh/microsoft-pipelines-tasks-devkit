@@ -41,6 +41,11 @@ export namespace AzureDevOps {
         value: Organization[];
     }
 
+    export interface Organizations {
+        ownerOrganizations: Organization[];
+        memberOrgs: Organization[];
+    }
+
     export interface Organization {
         accountId: string;
         accountName: string;

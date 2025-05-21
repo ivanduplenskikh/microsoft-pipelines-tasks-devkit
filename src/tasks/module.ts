@@ -10,33 +10,34 @@ export class TasksModule {
 
   constructor(private readonly context: vscode.ExtensionContext) {
     this.tasksProvider = new TasksProvider();
-    vscode.window.registerTreeDataProvider('tasksDevKit.tasks', this.tasksProvider);
-  }
 
-  registerCommands(): vscode.Disposable[] {
-    return [
-      vscode.commands.registerCommand('tasksDevKit.toggleTask', (taskItem: TaskItem) => {
-        this.tasksProvider.toggleTaskSelection(taskItem);
-      }),
+    vscode.window.registerTreeDataProvider('aptd.tasks', this.tasksProvider);
 
-      vscode.commands.registerCommand('tasksDevKit.build', () => {
-        this.executeTasks('build', this.tasksProvider.getSelectedTasks());
-      }),
+    vscode.commands.registerCommand(
+      'tasksDevKit.toggleTask',
+      (taskItem: TaskItem) => this.tasksProvider.toggleTaskSelection(taskItem)
+    );
 
-      vscode.commands.registerCommand('tasksDevKit.test', () => {
-        this.executeTasks('test', this.tasksProvider.getSelectedTasks());
-      }),
+    vscode.commands.registerCommand(
+      'tasksDevKit.build',
+      () => this.executeTasks('build', this.tasksProvider.getSelectedTasks())
+    );
 
-      vscode.commands.registerCommand('tasksDevKit.deploy', () => {
-        this.executeTasks('deploy', this.tasksProvider.getSelectedTasks());
-      }),
+    vscode.commands.registerCommand(
+      'tasksDevKit.test',
+      () => this.executeTasks('test', this.tasksProvider.getSelectedTasks())
+    );
 
-      vscode.commands.registerCommand('tasksDevKit.openTheTaskInFolderStructure', async (task: TaskItem) => {
-        const workspaceFolders = vscode.workspace.workspaceFolders;
-        const taskFolder = vscode.Uri.file(join(workspaceFolders![0].uri.fsPath, "Tasks", task.getFormattedName()));
-        await vscode.commands.executeCommand('revealInExplorer', taskFolder);
-      })
-    ];
+    vscode.commands.registerCommand(
+      'tasksDevKit.deploy',
+      () => this.executeTasks('deploy', this.tasksProvider.getSelectedTasks())
+    );
+
+    vscode.commands.registerCommand('tasksDevKit.openTheTaskInFolderStructure', async (task: TaskItem) => {
+      const workspaceFolders = vscode.workspace.workspaceFolders;
+      const taskFolder = vscode.Uri.file(join(workspaceFolders![0].uri.fsPath, "Tasks", task.getFormattedName()));
+      await vscode.commands.executeCommand('revealInExplorer', taskFolder);
+    });
   }
 
   private async executeTasks(action: 'build' | 'test' | 'deploy', selectedTasks: TaskItem[]) {

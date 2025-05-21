@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 
 import { AzureDevOpsOAuthProvider } from './AzureDevOps/AzureDevOpsOAuthProvider';
 
@@ -6,44 +6,29 @@ export class AuthenticationModule {
   readonly oauthAuthProvider: AzureDevOpsOAuthProvider;
 
   constructor(context: vscode.ExtensionContext) {
-    this.oauthAuthProvider = new AzureDevOpsOAuthProvider(context.secrets);
-  }
+    this.oauthAuthProvider = new AzureDevOpsOAuthProvider(context);
+    vscode.authentication.registerAuthenticationProvider(
+      AzureDevOpsOAuthProvider.id,
+      'Azure DevOps',
+      this.oauthAuthProvider,
+      { supportsMultipleAccounts: false },
+    );
 
-  registerAuthenticationProvider(): vscode.Disposable[] {
-    return [
-      vscode.authentication.registerAuthenticationProvider(
-        AzureDevOpsOAuthProvider.id,
-        'Azure DevOps',
-        this.oauthAuthProvider,
-        { supportsMultipleAccounts: false },
-      ),
-    ];
-  }
-
-  registerLoginCommand(): vscode.Disposable {
-    return vscode.commands.registerCommand('tasksDevKit.login', async () => {
+    vscode.commands.registerCommand('aptd.connectToOrganization', async () => {
       try {
         await vscode.authentication.getSession(AzureDevOpsOAuthProvider.id, [], { createIfNone: true });
-        vscode.window.showInformationMessage('Successfully logged in to Azure DevOps.');
       } catch (e: any) {
         vscode.window.showErrorMessage(`OAuth login failed: ${e.message}.`);
+        await vscode.commands.executeCommand("setContext", "aptd.isAuthorized", false);
       }
     });
-  }
 
-  registerLogoutCommand(): vscode.Disposable {
-    return vscode.commands.registerCommand('tasksDevKit.logout', async () => {
-      // Try to get OAuth session first
-      let session = await vscode.authentication.getSession(AzureDevOpsOAuthProvider.id, [], {
-        createIfNone: false,
-      });
+    vscode.commands.registerCommand('aptd.switchOrganization', async () => {
+        await this.oauthAuthProvider.switchOrganization();
+    });
 
-      if (session) {
-        // Logout from OAuth
-        await this.oauthAuthProvider.removeSession(session.id);
-        vscode.window.showInformationMessage('Successfully logged out of Azure DevOps.');
-        return;
-      }
+    vscode.commands.registerCommand('aptd.logout', async () => {
+      await this.oauthAuthProvider.removeSession();
     });
   }
 }

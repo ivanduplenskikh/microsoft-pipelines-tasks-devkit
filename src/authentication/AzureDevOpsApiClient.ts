@@ -23,7 +23,7 @@ export abstract class AzureDevOpsApiClient {
 
     return {
       ownerOrganizations: ownerOrganizations.value,
-      memberOrgs: memberOrgs.value
+      memberOrgs: memberOrgs.value.filter(x => ownerOrganizations.value.find(y => y.accountId === x.accountId) === undefined),
     };
   }
 

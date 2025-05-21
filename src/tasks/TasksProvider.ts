@@ -5,40 +5,23 @@ import vscode from 'vscode';
 
 import { TaskItem } from './TaskItem';
 
-class CategoryItem extends vscode.TreeItem {
-    constructor(
-        public readonly category: string,
-        public readonly childrenItems: TaskItem[]
-    ) {
-        super(category, vscode.TreeItemCollapsibleState.Collapsed);
-        this.contextValue = 'categoryItem';
-    }
-}
-
-export class TasksProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-  private workspaceRoot: string = '';
-
-  private _onDidChangeTreeData = new vscode.EventEmitter<vscode.TreeItem | undefined>();
-  readonly onDidChangeTreeData: vscode.Event<vscode.TreeItem | undefined> = this._onDidChangeTreeData.event;
+export class TasksProvider implements vscode.TreeDataProvider<TaskItem> {
+  private _onDidChangeTreeData = new vscode.EventEmitter<TaskItem | undefined>();
+  readonly onDidChangeTreeData: vscode.Event<TaskItem | undefined> = this._onDidChangeTreeData.event;
 
   private tasks: TaskItem[] = [];
 
   constructor() {
     const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (!workspaceFolders) {
-      vscode.window.showInformationMessage('No workspace folder open.',
-        'Open Folder'
-      ).then(selection => {
-        if (selection === 'Open Folder') {
-          vscode.commands.executeCommand('vscode.openFolder');
-        }
-      });
+
+    if (!workspaceFolders || !workspaceFolders[0].uri.fsPath) {
+      vscode.commands.executeCommand('setContext', 'aptd.hasTasksFolderStructure', false);
       return;
     }
 
-    const rootPath = workspaceFolders[0].uri.fsPath;
-    this.workspaceRoot = rootPath;
-    this.initTasks();
+    vscode.commands.executeCommand('setContext', 'aptd.hasTasksFolderStructure', true);
+    vscode.commands.executeCommand('setContext', 'aptd.isCompleted', true);
+    this.initTasks(join(workspaceFolders[0].uri.fsPath, 'Tasks'));
     this.refresh();
   }
 
@@ -75,15 +58,8 @@ export class TasksProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
     return this.tasks.filter(taskItem => taskItem.checked);
   }
 
-  private initTasks() {
-    if (!this.workspaceRoot) {
-      vscode.window.showInformationMessage('There is not workspace folder open.');
-      return;
-    }
-
-    const tasksDir = join(this.workspaceRoot, 'Tasks');
-
-    if (!existsSync(tasksDir)) {
+  private initTasks(tasksPath: string) {
+    if (!existsSync(tasksPath)) {
       vscode.window.showErrorMessage(
         'It seems you are not at the root of [the Tasks repository](https://github.com/microsoft/azure-pipelines-tasks).\nCould you please open the folder?',
         'Open Folder'
@@ -96,9 +72,9 @@ export class TasksProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
       return;
     }
 
-    const tasks = readdirSync(tasksDir)
-      .filter(task => existsSync(join(tasksDir, task, 'task.json')));
+    const tasks = readdirSync(tasksPath)
+      .filter(task => existsSync(join(tasksPath, task, 'task.json')));
 
-    this.tasks = tasks.map(x => new TaskItem(x, join(tasksDir, x)));
+    this.items = tasks.map(x => new TaskItem(x, join(tasksPath, x)));
   }
 }

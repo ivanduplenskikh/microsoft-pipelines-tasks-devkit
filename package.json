@@ -34,36 +34,86 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "tasksDevKit",
+          "id": "aptd",
           "title": "Tasks Dev Kit",
           "icon": "$(azure-devops)"
         }
       ]
     },
     "views": {
-      "tasksDevKit": [
+      "aptd": [
         {
-          "id": "tasksDevKit.tasks",
+          "id": "aptd.tasks",
           "name": "Tasks list",
+          "when": "aptd.isCompleted",
           "type": "tree"
         },
         {
-          "id": "tasksDevKit.settings",
+          "id": "aptd.settings",
           "name": "Settings",
+          "icon": "$(settings-gear)",
+          "when": "!aptd.isCompleted",
           "type": "tree"
         }
       ]
     },
     "viewsWelcome": [
       {
-        "view": "tasksDevKit.settings",
-        "contents": "In order to upload tasks to your organization, you need to be logged in to Azure DevOps.\n[Login to Azure DevOps](command:tasksDevKit.login)",
-        "when": "tasksDevKit.tfx.signed-in === false"
+        "view": "aptd.settings",
+        "contents": "👋 Welcome to Azure Pipelines Tasks Debugger!",
+        "group": "welcome"
       },
       {
-        "view": "tasksDevKit.settings",
-        "contents": "You are logged in to Azure DevOps.\n[Logout](command:tasksDevKit.logout)",
-        "when": "tasksDevKit.tfx.signed-in === true"
+        "view": "aptd.settings",
+        "contents": "Easily inspect, debug, and interact with Azure Pipelines Tasks — all within VS Code.",
+        "group": "welcome"
+      },
+      {
+        "view": "aptd.settings",
+        "contents": "Get started by connecting to your Azure DevOps organization.",
+        "group": "welcome"
+      },
+      {
+        "view": "aptd.settings",
+        "contents": "[Connect to an organization](command:aptd.connectToOrganization)",
+        "group": "welcome",
+        "when": "!aptd.isAuthorized"
+      },
+      {
+        "view": "aptd.settings",
+        "contents": "[Switch organization](command:aptd.switchOrganization)",
+        "group": "welcome",
+        "when": "aptd.isAuthorized"
+      },
+      {
+        "view": "aptd.settings",
+        "contents": "[Logout from Azure DevOps](command:aptd.logout)",
+        "group": "welcome",
+        "when": "aptd.isAuthorized"
+      },
+      {
+        "view": "aptd.settings",
+        "contents": "Now you can create Azure Pipelines Tasks folder structure.",
+        "group": "welcome",
+        "when": "aptd.isAuthorized && !aptd.hasTasksFolderStructure"
+      },
+      {
+        "view": "aptd.settings",
+        "contents": "[Open folder](command:vscode.openFolder)",
+        "group": "welcome",
+        "when": "aptd.isAuthorized && !aptd.hasTasksFolderStructure"
+      },
+      {
+        "view": "aptd.settings",
+        "contents": "You've opened the Azure Pipelines Tasks folder. You can now explore, work, and debug freely.",
+        "group": "welcome",
+        "when": "aptd.isAuthorized && aptd.hasTasksFolderStructure"
+      },
+      {
+        "view": "aptd.settings",
+        "contents": "[Let's go](command:aptd.letsGo)",
+        "group": "welcome",
+        "when": "aptd.isAuthorized && aptd.hasTasksFolderStructure"
       }
     ],
     "authentication": [
@@ -78,56 +128,71 @@
     ],
     "commands": [
       {
-        "command": "tasksDevKit.build",
-        "title": "Build Selected Tasks",
+        "command": "aptd.build",
+        "title": "Build",
         "icon": "$(git-stash)"
       },
       {
-        "command": "tasksDevKit.test",
-        "title": "Test Selected Tasks",
+        "command": "aptd.test",
+        "title": "Test",
         "icon": "$(beaker)"
       },
       {
-        "command": "tasksDevKit.deploy",
-        "title": "Deploy Selected Tasks",
+        "command": "aptd.deploy",
+        "title": "Deploy",
         "icon": "$(cloud-upload)"
       },
       {
-        "command": "tasksDevKit.login",
+        "command": "aptd.openSettings",
+        "title": "Settings",
+        "icon": "$(debug-configure)"
+      },
+      {
+        "command": "aptd.connectToOrganization",
         "title": "Login to Azure DevOps",
         "icon": "$(sign-in)"
       },
       {
-        "command": "tasksDevKit.logout",
+        "command": "aptd.switchOrganization",
+        "title": "Switch organization",
+        "icon": "$(sign-out)"
+      },
+      {
+        "command": "aptd.logout",
         "title": "Logout from Azure DevOps",
         "icon": "$(sign-out)"
       },
       {
-        "command": "tasksDevKit.openTheTaskInFolderStructure",
+        "command": "aptd.openTheTaskInFolderStructure",
         "title": "Open the task in folder structure"
       }
     ],
     "menus": {
       "view/title": [
         {
-          "command": "tasksDevKit.build",
-          "when": "view == tasksDevKit.tasks",
+          "command": "aptd.build",
+          "when": "view == aptd.tasks",
           "group": "navigation@1"
         },
         {
-          "command": "tasksDevKit.test",
-          "when": "view == tasksDevKit.tasks",
+          "command": "aptd.test",
+          "when": "view == aptd.tasks",
           "group": "navigation@2"
         },
         {
-          "command": "tasksDevKit.deploy",
-          "when": "view == tasksDevKit.tasks",
+          "command": "aptd.deploy",
+          "when": "view == aptd.tasks",
           "group": "navigation@3"
+        },
+        {
+          "command": "aptd.openSettings",
+          "when": "view == aptd.tasks",
+          "group": "navigation@4"
         }
       ],
       "view/item/context": [
         {
-          "command": "tasksDevKit.openTheTaskInFolderStructure",
+          "command": "aptd.openTheTaskInFolderStructure",
           "when": "viewItem == taskItem",
           "group": "navigation-task-item-context"
         }
