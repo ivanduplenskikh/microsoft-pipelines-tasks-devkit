@@ -14,26 +14,26 @@ export class TasksModule {
     vscode.window.registerTreeDataProvider('aptd.tasks', this.tasksProvider);
 
     vscode.commands.registerCommand(
-      'tasksDevKit.toggleTask',
+      'aptd.toggleTask',
       (taskItem: TaskItem) => this.tasksProvider.toggleTaskSelection(taskItem)
     );
 
     vscode.commands.registerCommand(
-      'tasksDevKit.build',
+      'aptd.build',
       () => this.executeTasks('build', this.tasksProvider.getSelectedTasks())
     );
 
     vscode.commands.registerCommand(
-      'tasksDevKit.test',
+      'aptd.test',
       () => this.executeTasks('test', this.tasksProvider.getSelectedTasks())
     );
 
     vscode.commands.registerCommand(
-      'tasksDevKit.deploy',
+      'aptd.deploy',
       () => this.executeTasks('deploy', this.tasksProvider.getSelectedTasks())
     );
 
-    vscode.commands.registerCommand('tasksDevKit.openTheTaskInFolderStructure', async (task: TaskItem) => {
+    vscode.commands.registerCommand('aptd.openTheTaskInFolderStructure', async (task: TaskItem) => {
       const workspaceFolders = vscode.workspace.workspaceFolders;
       const taskFolder = vscode.Uri.file(join(workspaceFolders![0].uri.fsPath, "Tasks", task.getFormattedName()));
       await vscode.commands.executeCommand('revealInExplorer', taskFolder);
