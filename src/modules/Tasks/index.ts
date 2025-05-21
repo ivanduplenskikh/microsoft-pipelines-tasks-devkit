@@ -42,10 +42,6 @@ export class TasksModule {
   }
 
   private async executeTasks(action: 'build' | 'test' | 'deploy', selectedTasks: TaskItem[]) {
-    if (this.context.storageUri && !existsSync(this.context.storageUri.toString())) {
-      await vscode.workspace.fs.createDirectory(this.context.storageUri);
-    }
-
     if (selectedTasks.length === 0) {
       vscode.window.showInformationMessage('No tasks selected.');
       return;

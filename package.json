@@ -45,6 +45,7 @@
         {
           "id": "aptd.tasks",
           "name": "Tasks list",
+          "icon": "$(list-selection)",
           "when": "aptd.isCompleted",
           "type": "tree"
         },
@@ -102,6 +103,24 @@
         "contents": "[Open folder](command:vscode.openFolder)",
         "group": "welcome",
         "when": "aptd.isAuthorized && !aptd.hasTasksFolderStructure"
+      },
+      {
+        "view": "aptd.settings",
+        "contents": "To debug and work with tasks you need to link your [self-hosted agent](https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=yaml%2Cbrowser#self-hosted-agents).",
+        "group": "welcome",
+        "when": "aptd.isAuthorized && !aptd.isAgentSetup"
+      },
+      {
+        "view": "aptd.settings",
+        "contents": "[Link agent](command:aptd.linkAgent)",
+        "group": "welcome",
+        "when": "aptd.isAuthorized && !aptd.isAgentSetup"
+      },
+      {
+        "view": "aptd.settings",
+        "contents": "[Unlink agent](command:aptd.unlinkAgent)",
+        "group": "welcome",
+        "when": "aptd.isAuthorized && aptd.isAgentSetup"
       },
       {
         "view": "aptd.settings",

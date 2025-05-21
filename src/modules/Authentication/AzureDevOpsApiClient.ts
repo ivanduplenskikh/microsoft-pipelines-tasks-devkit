@@ -1,4 +1,4 @@
-import { AzureDevOps } from './azuredevops';
+import { AzureDevOps } from '../../types';
 
 export abstract class AzureDevOpsApiClient {
   static async getUserOrganizations(accessToken: string, userAlias: string) {
