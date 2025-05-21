@@ -1,6 +1,6 @@
 import vscode from 'vscode';
 
-import { AzureDevOpsOAuthProvider } from './AzureDevOps/AzureDevOpsOAuthProvider';
+import { AzureDevOpsOAuthProvider } from './AzureDevOpsOAuthProvider';
 
 export class AuthenticationModule {
   readonly oauthAuthProvider: AzureDevOpsOAuthProvider;

@@ -2,8 +2,8 @@ import * as azdev from 'azure-devops-node-api';
 import vscode from 'vscode';
 
 import { AzureDevOpsOAuthSession } from './AzureDevOpsOAuthSession';
-import { AzureDevOpsApiClient } from '../AzureDevOpsApiClient';
-import { AzureDevOps } from '../azuredevops';
+import { AzureDevOpsApiClient } from './AzureDevOpsApiClient';
+import { AzureDevOps } from '../../types';
 
 interface OAuthSessionData {
   accessToken: string;

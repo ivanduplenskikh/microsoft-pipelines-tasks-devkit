@@ -1,10 +1,12 @@
 import vscode from 'vscode';
 
-import { AuthenticationModule } from './authentication/module';
-import { TasksModule } from './tasks/module';
+import { AuthenticationModule } from './modules/Authentication';
+import { TasksModule } from './modules/Tasks';
+import { AgentModule } from './modules/Agent';
 
 export async function activate(context: vscode.ExtensionContext) {
   new AuthenticationModule(context);
+  new AgentModule(context);
   new TasksModule(context),
 
   vscode.commands.registerCommand(
