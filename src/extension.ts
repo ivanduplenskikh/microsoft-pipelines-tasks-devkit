@@ -8,7 +8,7 @@ import { TasksModule } from './modules/Tasks';
 import { AgentModule } from './modules/Agent';
 
 export async function activate(context: vscode.ExtensionContext) {
-  console.log('Activating extension');
+  console.log('Activating extension from path', context.extension.extensionUri.toString());
 
   prepareEnvironment(context);
 
@@ -30,7 +30,7 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand('aptd.walkthrough.relink-agent', () => relinkAgent(context));
   vscode.commands.registerCommand('aptd.walkthrough.unlink-agent', () => unlinkAgent(context));
 
-  console.log('Congratulations, your extension "microsoft-pipelines-tasks-devkit" is now active!');
+  console.log(`Congratulations, your extension "${context.extension.id}" is now active!`);
 }
 
 async function unlinkAgent(context: vscode.ExtensionContext) {

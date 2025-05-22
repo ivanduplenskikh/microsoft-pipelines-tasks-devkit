@@ -49,7 +49,7 @@
       {
         "id": "aptd.walkthrough",
         "title": "Get started",
-        "description": "Azure Pipelines Tasks Debugger extension walkthrough can help you to set up the environment to debug your tasks.",
+        "description": "This walkthrough can help you to set up the environment to debug your tasks.",
         "steps": [
           {
             "id": "aptd.welcome",
@@ -75,14 +75,36 @@
             "media": {
               "altText": "Welcome to Azure Pipelines Tasks Debugger",
               "image": "media/walkthrough/welcome/welcome.png"
-            }
+            },
+            "when": "!aptd.walkrhrough.is-authorized"
+          },
+          {
+            "id": "aptd.switch-organization",
+            "title": "🏢 Switch organization",
+            "description": "You can switch between your organization.\n[Switch organization](command:aptd.walkthrough.logout)",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            },
+            "when": "aptd.walkrhrough.is-authorized"
+          },
+          {
+            "id": "aptd.logout",
+            "title": "🏢 Logout from organization",
+            "description": "Feel free to logout from your organization.\n[Logout](command:aptd.walkthrough.logout)",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            },
+            "when": "aptd.walkrhrough.is-authorized"
           },
           {
             "id": "aptd.agent",
             "title": "🚀 Link your self-hosted agent",
             "description": "To debug and work with tasks you need to link your [self-hosted agent](https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=yaml%2Cbrowser#self-hosted-agents).\n[Link agent](command:aptd.walkthrough.link-agent)",
             "media": {
-              "markdown": "media/walkthrough/agent/agent.md"
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
             },
             "when": "!aptd.is-agent-linked"
           },

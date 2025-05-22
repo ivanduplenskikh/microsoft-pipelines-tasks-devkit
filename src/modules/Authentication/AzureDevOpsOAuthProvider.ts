@@ -27,9 +27,13 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
 
   async getSessions(): Promise<vscode.AuthenticationSession[]> {
     const session = await this.getStoredSession();
+
+    await vscode.commands.executeCommand('setContext', 'aptd.walkrhrough.is-authorized', !!session);
+
     if (session) {
       return [new AzureDevOpsOAuthSession(session.accessToken, session.organization, session.userId)];
     }
+
     return [];
   }
 
@@ -71,7 +75,6 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
     this.currentSession = await this.getStoredSession();
 
     await vscode.commands.executeCommand('setContext', 'aptd.walkrhrough.is-authorized', !!this.currentSession);
-    console.log(this.currentSession);
     const added: vscode.AuthenticationSession[] = [];
     const removed: vscode.AuthenticationSession[] = [];
 
@@ -132,6 +135,7 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
   }
 
   private async authorize(msSession: vscode.AuthenticationSession) {
+    console.log('Authorizing with Azure DevOps using Microsoft account');
     const organization = await this.promptOrganization(msSession.accessToken);
 
     if (!organization) {
@@ -187,6 +191,7 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
    * Create a new authentication session using Microsoft account authentication
    */
   async createSession(scopes: readonly string[], options?: vscode.AuthenticationGetSessionOptions): Promise<vscode.AuthenticationSession> {
+    console.log('Creating new authentication session');
     try {
       // Use VS Code's built-in Microsoft authentication (which is already OAuth-based)
       // This leverages the existing MS authentication provider to get a token
@@ -197,6 +202,7 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
       this.authorize(msSession);
       return msSession;
     } catch (error) {
+      console.log('Error creating session:', error);
       if (error instanceof Error) {
         throw error;
       }
