@@ -1,7 +1,7 @@
 import { join } from 'node:path';
-import { existsSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 
-import vscode from 'vscode';
+import vscode, { tasks } from 'vscode';
 
 import { TaskItem } from './TaskItem';
 
@@ -11,7 +11,7 @@ export class TasksProvider implements vscode.TreeDataProvider<TaskItem> {
 
   private tasks: TaskItem[] = [];
 
-  constructor() {
+  constructor(private readonly context: vscode.ExtensionContext) {
     const workspaceFolders = vscode.workspace.workspaceFolders;
 
     if (!workspaceFolders || !workspaceFolders[0].uri.fsPath) {
@@ -49,32 +49,30 @@ export class TasksProvider implements vscode.TreeDataProvider<TaskItem> {
     return Promise.resolve([]);
   }
 
-  toggleTaskSelection(taskItem: TaskItem): void {
+  toggleTaskSelection(taskName: string): void {
+    const taskItem = this.items.find(taskItem => taskItem.label === taskName);
+
+    if (!taskItem) {
+      vscode.window.showErrorMessage(`Task ${taskName} not found`);
+      return;
+    }
+
     taskItem.toggle();
     this._onDidChangeTreeData.fire(taskItem);
   }
 
-  getSelectedTasks(): TaskItem[] {
-    return this.tasks.filter(taskItem => taskItem.checked);
+  getSelected(): TaskItem[] {
+    return this.items.filter(taskItem => taskItem.checked);
   }
 
-  private initTasks(tasksPath: string) {
-    if (!existsSync(tasksPath)) {
-      vscode.window.showErrorMessage(
-        'It seems you are not at the root of [the Tasks repository](https://github.com/microsoft/azure-pipelines-tasks).\nCould you please open the folder?',
-        'Open Folder'
-      ).then(selection => {
-        if (selection === 'Open Folder') {
-          vscode.commands.executeCommand('vscode.openFolder');
-        }
-      });
+  private initTasks(taskRootFolderPath: string) {
+    let tasksPaths = this.context.workspaceState.get<string[]>('tasks');
 
-      return;
+    if (tasksPaths === undefined) {
+      tasksPaths = readdirSync(taskRootFolderPath).filter(x => existsSync(join(taskRootFolderPath, x, 'task.json')));
+      this.context.workspaceState.update('tasks', tasksPaths);
     }
 
-    const tasks = readdirSync(tasksPath)
-      .filter(task => existsSync(join(tasksPath, task, 'task.json')));
-
-    this.items = tasks.map(x => new TaskItem(x, join(tasksPath, x)));
+    this.items = tasksPaths.map(x => new TaskItem(x, join(taskRootFolderPath, x)));
   }
 }

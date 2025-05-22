@@ -42,9 +42,9 @@ export class TaskItem extends vscode.TreeItem {
       this.description = 'Not the NodeJS task';
     } else {
       this.command = {
-        command: 'tasksDevKit.toggleTask',
+        command: 'aptd.toggleTask',
         title: 'Toggle Task Selection',
-        arguments: [this],
+        arguments: [this.label],
       };
     }
 
@@ -53,6 +53,10 @@ export class TaskItem extends vscode.TreeItem {
 
   getFormattedName() {
     return `${this.object.name}V${this.object.version.Major}`;
+  }
+
+  getVersion() {
+    return `${this.object.version.Major}.${this.object.version.Minor}.${this.object.version.Patch}`;
   }
 
   getWorkName() {

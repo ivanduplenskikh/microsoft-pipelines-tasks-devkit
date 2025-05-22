@@ -1,4 +1,4 @@
-import { existsSync, lstatSync, rmSync, symlinkSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import vscode from 'vscode';
@@ -10,29 +10,14 @@ export class TasksModule {
   readonly tasksProvider: TasksProvider;
 
   constructor(private readonly context: vscode.ExtensionContext) {
-    this.tasksProvider = new TasksProvider();
+    this.tasksProvider = new TasksProvider(context);
 
     vscode.window.registerTreeDataProvider('aptd.tasks', this.tasksProvider);
 
-    vscode.commands.registerCommand(
-      'aptd.toggleTask',
-      (taskItem: TaskItem) => this.tasksProvider.toggleTaskSelection(taskItem)
-    );
-
-    vscode.commands.registerCommand(
-      'aptd.build',
-      () => this.executeTasks('build', this.tasksProvider.getSelectedTasks())
-    );
-
-    vscode.commands.registerCommand(
-      'aptd.test',
-      () => this.executeTasks('test', this.tasksProvider.getSelectedTasks())
-    );
-
-    vscode.commands.registerCommand(
-      'aptd.deploy',
-      () => this.executeTasks('deploy', this.tasksProvider.getSelectedTasks())
-    );
+    vscode.commands.registerCommand('aptd.toggleTask', (x: string) => this.tasksProvider.toggleTaskSelection(x));
+    vscode.commands.registerCommand('aptd.build', () => this.executeTasks('build', this.tasksProvider.getSelected()));
+    vscode.commands.registerCommand('aptd.test',() => this.executeTasks('test', this.tasksProvider.getSelected()));
+    vscode.commands.registerCommand('aptd.deploy', () => this.executeTasks('deploy', this.tasksProvider.getSelected()));
 
     vscode.commands.registerCommand('aptd.openTheTaskInFolderStructure', async (task: TaskItem) => {
       const workspaceFolders = vscode.workspace.workspaceFolders;
@@ -53,25 +38,26 @@ export class TasksModule {
       case 'build':
         terminal.sendText(`node make.js build --task "@(${selectedTasks.map(x => x.label).join("|")})" --include-sourcemap`);
 
-        const workspaceFolders = vscode.workspace.workspaceFolders;
-        const agentTasksFolder = join(this.context.storageUri!.fsPath, "agent/_work/_tasks");
-
-        if (!existsSync(agentTasksFolder)) {
-          vscode.window.showErrorMessage(`Agent tasks folder does not exist: ${agentTasksFolder}`);
-          return;
-        }
-
         selectedTasks.forEach(task => {
-          const path = join(agentTasksFolder, task.getWorkName());
-          if (existsSync(path)) {
-            if (lstatSync(path).isSymbolicLink()) {
-              return;
-            }
+          const agentTaskPath = join(this.context.storageUri!.fsPath, "agent/_work/_tasks", task.getWorkName());
 
-            rmSync(path, { recursive: true, force: true });
+          if (!existsSync(agentTaskPath)) {
+            mkdirSync(agentTaskPath);
           }
 
-          symlinkSync(vscode.Uri.file(join(workspaceFolders![0].uri.fsPath, "Tasks", task.getFormattedName())).fsPath, path);
+          const taskFolderPath = join(agentTaskPath, task.getVersion());
+          writeFileSync(`${join(agentTaskPath, task.getVersion())}.completed`, new Date().toLocaleDateString());
+
+          if (existsSync(taskFolderPath)) {
+            if (lstatSync(taskFolderPath).isSymbolicLink()) {
+              console.log(`Symlink for task already exists, skipping creation:\n${taskFolderPath}`);
+              unlinkSync(taskFolderPath);
+            } else {
+            rmSync(taskFolderPath, { recursive: true, force: true });
+            }
+          }
+
+          symlinkSync(vscode.Uri.file(join(vscode.workspace.workspaceFolders![0].uri.fsPath, "_build/Tasks", task.getFormattedName())).fsPath, taskFolderPath);
         });
         break;
       case 'test':

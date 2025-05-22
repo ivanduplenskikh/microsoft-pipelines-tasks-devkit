@@ -94,7 +94,7 @@
       },
       {
         "view": "aptd.settings",
-        "contents": "Now you can create Azure Pipelines Tasks folder structure.",
+        "contents": "Now you can open Azure Pipelines Tasks folder structure.",
         "group": "welcome",
         "when": "aptd.isAuthorized && !aptd.hasTasksFolderStructure"
       },
