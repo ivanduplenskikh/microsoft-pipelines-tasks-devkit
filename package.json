@@ -45,6 +45,33 @@
         }
       ]
     },
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "aptd.commands.tasks.build",
+          "icon": "$(folder-opened)",
+          "when": "view == aptd.tasks && viewItem == taskItem",
+          "group": "inline"
+        },
+        {
+          "command": "aptd.commands.tasks.open-sources-folder",
+          "when": "view == aptd.tasks && viewItem == taskItem",
+          "group": "navigation-task-item-context"
+        }
+      ]
+    },
+     "commands": [
+      {
+        "command": "aptd.commands.tasks.build",
+        "title": "Build",
+        "icon": "$(git-stash)"
+      },
+      {
+        "command": "aptd.commands.tasks.open-sources-folder",
+        "title": "Open the task folder"
+      }
+    ],
+
     "walkthroughs": [
       {
         "id": "aptd.walkthrough",

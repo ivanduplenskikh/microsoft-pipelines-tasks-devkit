@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 import { existsSync, readdirSync } from 'node:fs';
 
-import vscode, { tasks } from 'vscode';
+import vscode from 'vscode';
 
 import { TaskItem } from './TaskItem';
 
@@ -52,22 +52,6 @@ export class TasksProvider implements vscode.TreeDataProvider<TaskItem> {
     }
 
     return Promise.resolve([]);
-  }
-
-  toggleTaskSelection(taskName: string): void {
-    const taskItem = this.items.find(taskItem => taskItem.label === taskName);
-
-    if (!taskItem) {
-      vscode.window.showErrorMessage(`Task ${taskName} not found`);
-      return;
-    }
-
-    taskItem.toggle();
-    this._onDidChangeTreeData.fire(taskItem);
-  }
-
-  getSelected(): TaskItem[] {
-    return this.items.filter(taskItem => taskItem.checked);
   }
 
   private initTasks(taskRootFolderPath: string) {

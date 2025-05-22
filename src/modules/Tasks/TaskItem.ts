@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, readFileSync, rmSync, symlinkSync, unlinkSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import vscode from 'vscode';
@@ -23,7 +23,6 @@ type TaskJson = {
 };
 
 export class TaskItem extends vscode.TreeItem {
-  public checked: boolean = false;
   public readonly object: TaskJson;
   public isDisabled: boolean = false;
 
@@ -37,18 +36,43 @@ export class TaskItem extends vscode.TreeItem {
     this.tooltip = this.path;
 
     if (this.isDisabled) {
-      this.command = undefined;
-      this.tooltip = 'This item is disabled';
+      this.iconPath = new vscode.ThemeIcon('circle-slash');
       this.description = 'Not the NodeJS task';
     } else {
       this.command = {
-        command: 'aptd.toggleTask',
-        title: 'Toggle Task Selection',
-        arguments: [this.label],
+        command: 'aptd.commands.tasks.build',
+        title: 'Build the task',
+        arguments: [this]
       };
     }
+  }
 
-    this.updateIcon();
+  async build(fsPath: string) {
+    const terminal = vscode.window.activeTerminal ?? vscode.window.createTerminal('Azure Pipelines');
+
+    terminal.sendText(`node make.js build --task "@(${this.label})" --include-sourcemap`);
+
+    const agentTaskPath = join(fsPath, "agent/_work/_tasks", this.getWorkName());
+
+    if (!existsSync(agentTaskPath)) {
+      mkdirSync(agentTaskPath);
+    }
+
+    const taskFolderPath = join(agentTaskPath, this.getVersion());
+    writeFileSync(`${join(agentTaskPath, this.getVersion())}.completed`, new Date().toLocaleDateString());
+
+    if (existsSync(taskFolderPath)) {
+      if (lstatSync(taskFolderPath).isSymbolicLink()) {
+        console.log(`Symlink for task already exists, skipping creation:\n${taskFolderPath}`);
+        unlinkSync(taskFolderPath);
+      } else {
+        rmSync(taskFolderPath, { recursive: true, force: true });
+      }
+    }
+
+    symlinkSync(vscode.Uri.file(join(vscode.workspace.workspaceFolders![0].uri.fsPath, "_build/Tasks", this.getFormattedName())).fsPath, taskFolderPath);
+
+    terminal.show();
   }
 
   getFormattedName() {
@@ -61,21 +85,6 @@ export class TaskItem extends vscode.TreeItem {
 
   getWorkName() {
     return `${this.object.name}_${this.object.id.toLowerCase()}`;
-  }
-
-  toggle() {
-    this.checked = !this.checked;
-    this.updateIcon();
-  }
-
-  updateIcon(): void {
-    if (this.isDisabled) {
-      this.iconPath = new vscode.ThemeIcon('circle-slash');
-    } else if (this.checked) {
-      this.iconPath = new vscode.ThemeIcon('check');
-    } else {
-      this.iconPath = new vscode.ThemeIcon('circle-large-outline');
-    }
   }
 
   private isTaskDisabled(): boolean {
