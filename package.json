@@ -46,6 +46,13 @@
       ]
     },
     "menus": {
+      "view/title": [
+        {
+          "command": "aptd.commands.tasks.attach-to-process",
+          "when": "view == aptd.tasks",
+          "group": "navigation@1"
+        }
+      ],
       "view/item/context": [
         {
           "command": "aptd.commands.tasks.build",
@@ -61,6 +68,11 @@
       ]
     },
      "commands": [
+      {
+        "command": "aptd.commands.tasks.attach-to-process",
+        "title": "Attach to process",
+        "icon": "$(callstack-view-session)"
+      },
       {
         "command": "aptd.commands.tasks.build",
         "title": "Build",

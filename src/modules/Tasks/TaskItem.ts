@@ -38,39 +38,35 @@ export class TaskItem extends vscode.TreeItem {
     if (this.isDisabled) {
       this.iconPath = new vscode.ThemeIcon('circle-slash');
       this.description = 'Not the NodeJS task';
-    } else {
-      this.command = {
-        command: 'aptd.commands.tasks.build',
-        title: 'Build the task',
-        arguments: [this]
-      };
     }
   }
 
   async build(fsPath: string) {
-    const terminal = vscode.window.activeTerminal ?? vscode.window.createTerminal('Azure Pipelines');
-
-    terminal.sendText(`node make.js build --task "@(${this.label})" --include-sourcemap`);
-
     const agentTaskPath = join(fsPath, "agent/_work/_tasks", this.getWorkName());
 
     if (!existsSync(agentTaskPath)) {
       mkdirSync(agentTaskPath);
     }
 
-    const taskFolderPath = join(agentTaskPath, this.getVersion());
+    const terminal = vscode.window.activeTerminal ?? vscode.window.createTerminal('Azure Pipelines');
+    terminal.sendText(`node make.js build --task "@(${this.label})" --include-sourcemap`);
+
+    const sourcePath = vscode.Uri.file(join(vscode.workspace.workspaceFolders![0].uri.fsPath, "_build/Tasks", this.getFormattedName())).fsPath;
+    console.log('Source path', sourcePath);
+    const targetPath = join(agentTaskPath, this.getVersion());
+    console.log('Target path', targetPath);
     writeFileSync(`${join(agentTaskPath, this.getVersion())}.completed`, new Date().toLocaleDateString());
 
-    if (existsSync(taskFolderPath)) {
-      if (lstatSync(taskFolderPath).isSymbolicLink()) {
-        console.log(`Symlink for task already exists, skipping creation:\n${taskFolderPath}`);
-        unlinkSync(taskFolderPath);
+    if (existsSync(targetPath)) {
+      if (lstatSync(targetPath).isSymbolicLink()) {
+        console.log(`Symlink for task already exists, skipping creation:\n${targetPath}`);
+        unlinkSync(targetPath);
       } else {
-        rmSync(taskFolderPath, { recursive: true, force: true });
+        rmSync(targetPath, { recursive: true, force: true });
       }
     }
 
-    symlinkSync(vscode.Uri.file(join(vscode.workspace.workspaceFolders![0].uri.fsPath, "_build/Tasks", this.getFormattedName())).fsPath, taskFolderPath);
+    symlinkSync(sourcePath, targetPath);
 
     terminal.show();
   }
