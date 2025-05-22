@@ -1,15 +1,11 @@
 {
-  "name": "pipelines-tasks-devkit",
-  "displayName": "Microsoft Pipelines Tasks Dev Kit",
-  "description": "Dev Kit for Azure DevOps pipelines tasks",
-  "version": "1.0.1",
-  "publisher": "VladyslavHorbachov",
+  "name": "azure-pipelines-tasks-debugger",
+  "displayName": "Azure Pipelines Tasks Debugger",
+  "description": "The Azure Pipelines Tasks Debugger extension provides a set of tools to help you debug your Azure DevOps tasks.",
+  "version": "1.0.0",
+  "publisher": "azure-pipelines-tasks-debugger-publisher",
   "engines": {
     "vscode": "^1.95.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/LeftTwixWand/microsoft-pipelines-tasks-devkit"
   },
   "license": "MIT",
   "icon": "assets/azure-devops.png",
@@ -24,7 +20,6 @@
     "Azure",
     "DevOps"
   ],
-  "homepage": "https://github.com/LeftTwixWand/microsoft-pipelines-tasks-devkit",
   "categories": [
     "Other"
   ],
@@ -35,7 +30,7 @@
       "activitybar": [
         {
           "id": "aptd",
-          "title": "Tasks Dev Kit",
+          "title": "Azure Pipelines Tasks Debugger",
           "icon": "$(azure-devops)"
         }
       ]
@@ -46,177 +41,80 @@
           "id": "aptd.tasks",
           "name": "Tasks list",
           "icon": "$(list-selection)",
-          "when": "aptd.isCompleted",
-          "type": "tree"
-        },
-        {
-          "id": "aptd.settings",
-          "name": "Settings",
-          "icon": "$(settings-gear)",
-          "when": "!aptd.isCompleted",
           "type": "tree"
         }
       ]
     },
-    "viewsWelcome": [
+    "walkthroughs": [
       {
-        "view": "aptd.settings",
-        "contents": "👋 Welcome to Azure Pipelines Tasks Debugger!",
-        "group": "welcome"
-      },
-      {
-        "view": "aptd.settings",
-        "contents": "Easily inspect, debug, and interact with Azure Pipelines Tasks — all within VS Code.",
-        "group": "welcome"
-      },
-      {
-        "view": "aptd.settings",
-        "contents": "Get started by connecting to your Azure DevOps organization.",
-        "group": "welcome"
-      },
-      {
-        "view": "aptd.settings",
-        "contents": "[Connect to an organization](command:aptd.connectToOrganization)",
-        "group": "welcome",
-        "when": "!aptd.isAuthorized"
-      },
-      {
-        "view": "aptd.settings",
-        "contents": "[Switch organization](command:aptd.switchOrganization)",
-        "group": "welcome",
-        "when": "aptd.isAuthorized"
-      },
-      {
-        "view": "aptd.settings",
-        "contents": "[Logout from Azure DevOps](command:aptd.logout)",
-        "group": "welcome",
-        "when": "aptd.isAuthorized"
-      },
-      {
-        "view": "aptd.settings",
-        "contents": "Now you can open Azure Pipelines Tasks folder structure.",
-        "group": "welcome",
-        "when": "aptd.isAuthorized && !aptd.hasTasksFolderStructure"
-      },
-      {
-        "view": "aptd.settings",
-        "contents": "[Open folder](command:vscode.openFolder)",
-        "group": "welcome",
-        "when": "aptd.isAuthorized && !aptd.hasTasksFolderStructure"
-      },
-      {
-        "view": "aptd.settings",
-        "contents": "To debug and work with tasks you need to link your [self-hosted agent](https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=yaml%2Cbrowser#self-hosted-agents).",
-        "group": "welcome",
-        "when": "aptd.isAuthorized && !aptd.isAgentSetup"
-      },
-      {
-        "view": "aptd.settings",
-        "contents": "[Link agent](command:aptd.linkAgent)",
-        "group": "welcome",
-        "when": "aptd.isAuthorized && !aptd.isAgentSetup"
-      },
-      {
-        "view": "aptd.settings",
-        "contents": "[Unlink agent](command:aptd.unlinkAgent)",
-        "group": "welcome",
-        "when": "aptd.isAuthorized && aptd.isAgentSetup"
-      },
-      {
-        "view": "aptd.settings",
-        "contents": "You've opened the Azure Pipelines Tasks folder.\nYou can now explore, work, and debug freely.",
-        "group": "welcome",
-        "when": "aptd.isAuthorized && aptd.hasTasksFolderStructure"
-      },
-      {
-        "view": "aptd.settings",
-        "contents": "[Let's go](command:aptd.letsGo)",
-        "group": "welcome",
-        "when": "aptd.isAuthorized && aptd.hasTasksFolderStructure"
+        "id": "aptd.walkthrough",
+        "title": "Get started",
+        "description": "Azure Pipelines Tasks Debugger extension walkthrough can help you to set up the environment to debug your tasks.",
+        "steps": [
+          {
+            "id": "aptd.welcome",
+            "title": "👋 Welcome!",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            }
+          },
+          {
+            "id": "aptd.open-task-folder",
+            "title": "📂 Open Azure Pipelines Tasks repository",
+            "description": "Open the Azure Pipelines Tasks repository folder\n[Open the folder](command:workbench.action.files.openFolder)",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            }
+          },
+          {
+            "id": "aptd.connect-to-organization",
+            "title": "🏢 Connect to your organization",
+            "description": "To debug the tasks you need to connect to one of your organization\n[Connect](command:aptd.walkthrough.connect-to-organization)",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            }
+          },
+          {
+            "id": "aptd.agent",
+            "title": "🚀 Link your self-hosted agent",
+            "description": "To debug and work with tasks you need to link your [self-hosted agent](https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=yaml%2Cbrowser#self-hosted-agents).\n[Link agent](command:aptd.walkthrough.link-agent)",
+            "media": {
+              "markdown": "media/walkthrough/agent/agent.md"
+            },
+            "when": "!aptd.is-agent-linked"
+          },
+          {
+            "id": "aptd.relink-agent",
+            "title": "✂️ Re-link your self-hosted agent",
+            "description": "You can easily relink the extension to another agent.\n[Relink agent](command:aptd.walkthrough.relink-agent)",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            },
+            "when": "aptd.is-agent-linked"
+          },
+          {
+            "id": "aptd.unlink-agent",
+            "title": "🗑️ Unlink your self-hosted agent",
+            "description": "You can easily unlink the extension to another agent.\n[Unlink agent](command:aptd.walkthrough.unlink-agent)",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            },
+            "when": "aptd.is-agent-linked"
+          }
+        ]
       }
     ],
     "authentication": [
       {
-        "id": "azuredevopspat",
-        "label": "Azure DevOps PAT"
-      },
-      {
         "id": "azuredevopsoauth",
         "label": "Azure DevOps"
       }
-    ],
-    "commands": [
-      {
-        "command": "aptd.build",
-        "title": "Build",
-        "icon": "$(git-stash)"
-      },
-      {
-        "command": "aptd.test",
-        "title": "Test",
-        "icon": "$(beaker)"
-      },
-      {
-        "command": "aptd.deploy",
-        "title": "Deploy",
-        "icon": "$(cloud-upload)"
-      },
-      {
-        "command": "aptd.openSettings",
-        "title": "Settings",
-        "icon": "$(debug-configure)"
-      },
-      {
-        "command": "aptd.connectToOrganization",
-        "title": "Login to Azure DevOps",
-        "icon": "$(sign-in)"
-      },
-      {
-        "command": "aptd.switchOrganization",
-        "title": "Switch organization",
-        "icon": "$(sign-out)"
-      },
-      {
-        "command": "aptd.logout",
-        "title": "Logout from Azure DevOps",
-        "icon": "$(sign-out)"
-      },
-      {
-        "command": "aptd.openTheTaskInFolderStructure",
-        "title": "Open the task in folder structure"
-      }
-    ],
-    "menus": {
-      "view/title": [
-        {
-          "command": "aptd.build",
-          "when": "view == aptd.tasks",
-          "group": "navigation@1"
-        },
-        {
-          "command": "aptd.test",
-          "when": "view == aptd.tasks",
-          "group": "navigation@2"
-        },
-        {
-          "command": "aptd.deploy",
-          "when": "view == aptd.tasks",
-          "group": "navigation@3"
-        },
-        {
-          "command": "aptd.openSettings",
-          "when": "view == aptd.tasks",
-          "group": "navigation@4"
-        }
-      ],
-      "view/item/context": [
-        {
-          "command": "aptd.openTheTaskInFolderStructure",
-          "when": "viewItem == taskItem",
-          "group": "navigation-task-item-context"
-        }
-      ]
-    }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",

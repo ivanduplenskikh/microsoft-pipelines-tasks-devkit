@@ -15,6 +15,12 @@ export class TasksProvider implements vscode.TreeDataProvider<TaskItem> {
     const workspaceFolders = vscode.workspace.workspaceFolders;
 
     if (!workspaceFolders || !workspaceFolders[0].uri.fsPath) {
+      console.log('it will open the walkthrough 2');
+      vscode.commands.executeCommand(
+        'workbench.action.openWalkthrough',
+        'azure-pipelines-tasks-debugger-publisher.azure-pipelines-tasks-debugger#aptd.walkthrough',
+        false
+      );
       vscode.commands.executeCommand('setContext', 'aptd.hasTasksFolderStructure', false);
       return;
     }

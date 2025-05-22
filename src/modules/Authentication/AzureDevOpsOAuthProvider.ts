@@ -35,7 +35,15 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
 
   private async initialize() {
     this.currentSession = await this.getStoredSession();
-    await vscode.commands.executeCommand('setContext', 'aptd.isAuthorized', !!this.currentSession);
+    await vscode.commands.executeCommand('setContext', 'aptd.walkrhrough.is-authorized', !!this.currentSession);
+
+    if (!!this.currentSession) {
+      vscode.commands.executeCommand(
+        'workbench.action.openWalkthrough',
+        'azure-pipelines-tasks-debugger-publisher.azure-pipelines-tasks-debugger#aptd.walkthrough',
+        false
+      );
+    }
 
     this.disposables.push(
       this.context.secrets.onDidChange(async (e) => {
@@ -62,8 +70,8 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
     const previousSession = this.currentSession;
     this.currentSession = await this.getStoredSession();
 
-    await vscode.commands.executeCommand('setContext', 'aptd.isAuthorized', !!this.currentSession);
-    console.log(this.currentSession)
+    await vscode.commands.executeCommand('setContext', 'aptd.walkrhrough.is-authorized', !!this.currentSession);
+    console.log(this.currentSession);
     const added: vscode.AuthenticationSession[] = [];
     const removed: vscode.AuthenticationSession[] = [];
 
@@ -153,7 +161,7 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
 
       await this.context.secrets.store(AzureDevOpsOAuthProvider.secretKey, JSON.stringify(sessionData));
       this.currentSession = sessionData;
-      await vscode.commands.executeCommand('setContext', 'aptd.isAuthorized', true);
+      await vscode.commands.executeCommand('setContext', 'aptd.walkrhrough.is-authorized', true);
       const session = new AzureDevOpsOAuthSession(msSession.accessToken, organization.accountName, userInfo[0].id);
       this._onDidChangeSessions.fire({ added: [session], removed: [], changed: [] });
       return session;
@@ -207,7 +215,7 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
 
     if (!session) {
       console.warn('No session found to remove');
-      await vscode.commands.executeCommand('setContext', 'aptd.isAuthorized', false);
+      await vscode.commands.executeCommand('setContext', 'aptd.walkrhrough.is-authorized', false);
       return;
     }
 
@@ -227,7 +235,7 @@ export class AzureDevOpsOAuthProvider implements vscode.AuthenticationProvider, 
 
     this.context.workspaceState.update('organizations', undefined);
     console.warn('Logged out of Azure DevOps');
-    await vscode.commands.executeCommand('setContext', 'aptd.isAuthorized', false);
+    await vscode.commands.executeCommand('setContext', 'aptd.walkrhrough.is-authorized', false);
   }
 
   dispose() {
