@@ -1,17 +1,14 @@
 {
-  "name": "pipelines-tasks-devkit",
-  "displayName": "Microsoft Pipelines Tasks Dev Kit",
-  "description": "Dev Kit for Azure DevOps pipelines tasks",
-  "version": "1.0.1",
-  "publisher": "VladyslavHorbachov",
+  "name": "azure-pipelines-tasks-debugger",
+  "displayName": "Azure Pipelines Tasks Debugger",
+  "description": "The Azure Pipelines Tasks Debugger extension provides a set of tools to help you debug your Azure DevOps tasks.",
+  "version": "1.0.0",
+  "publisher": "azure-pipelines-tasks-debugger-publisher",
   "engines": {
     "vscode": "^1.95.0"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/LeftTwixWand/microsoft-pipelines-tasks-devkit"
-  },
   "license": "MIT",
+  "repository": "github:ivanduplenskikh/microsoft-pipelines-tasks-devkit",
   "icon": "assets/azure-devops.png",
   "galleryBanner": {
     "color": "#1e1e1e",
@@ -24,7 +21,6 @@
     "Azure",
     "DevOps"
   ],
-  "homepage": "https://github.com/LeftTwixWand/microsoft-pipelines-tasks-devkit",
   "categories": [
     "Other"
   ],
@@ -34,101 +30,153 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "tasksDevKit",
-          "title": "Tasks Dev Kit",
+          "id": "aptd",
+          "title": "Azure Pipelines Tasks Debugger",
           "icon": "$(azure-devops)"
         }
       ]
     },
     "views": {
-      "tasksDevKit": [
+      "aptd": [
         {
-          "id": "tasksDevKit.tasks",
+          "id": "aptd.tasks",
           "name": "Tasks list",
-          "type": "tree"
-        },
-        {
-          "id": "tasksDevKit.settings",
-          "name": "Settings",
+          "icon": "$(list-selection)",
           "type": "tree"
         }
       ]
     },
-    "viewsWelcome": [
-      {
-        "view": "tasksDevKit.settings",
-        "contents": "In order to upload tasks to your organization, you need to be logged in TFX.\n[Login to TFX](command:tasksDevKit.login)",
-        "when": "tasksDevKit.tfx.signed-in === false"
-      },
-      {
-        "view": "tasksDevKit.settings",
-        "contents": "You are logged in to Azure DevOps.\n[Logout](command:tasksDevKit.logout)",
-        "when": "tasksDevKit.tfx.signed-in === true"
-      }
-    ],
-    "authentication": [
-      {
-        "id": "azuredevopspat",
-        "label": "Azure DevOps PAT"
-      }
-    ],
-    "commands": [
-      {
-        "command": "tasksDevKit.build",
-        "title": "Build Selected Tasks",
-        "icon": "$(git-stash)"
-      },
-      {
-        "command": "tasksDevKit.test",
-        "title": "Test Selected Tasks",
-        "icon": "$(beaker)"
-      },
-      {
-        "command": "tasksDevKit.deploy",
-        "title": "Deploy Selected Tasks",
-        "icon": "$(cloud-upload)"
-      },
-      {
-        "command": "tasksDevKit.login",
-        "title": "Login to Azure DevOps",
-        "icon": "$(sign-in)"
-      },
-      {
-        "command": "tasksDevKit.logout",
-        "title": "Logout from Azure DevOps",
-        "icon": "$(sign-out)"
-      },
-      {
-        "command": "tasksDevKit.openTheTaskInFolderStructure",
-        "title": "Open the task in folder structure"
-      }
-    ],
     "menus": {
       "view/title": [
         {
-          "command": "tasksDevKit.build",
-          "when": "view == tasksDevKit.tasks",
+          "command": "aptd.commands.tasks.attach-to-process",
+          "when": "view == aptd.tasks",
           "group": "navigation@1"
-        },
-        {
-          "command": "tasksDevKit.test",
-          "when": "view == tasksDevKit.tasks",
-          "group": "navigation@2"
-        },
-        {
-          "command": "tasksDevKit.deploy",
-          "when": "view == tasksDevKit.tasks",
-          "group": "navigation@3"
         }
       ],
       "view/item/context": [
         {
-          "command": "tasksDevKit.openTheTaskInFolderStructure",
-          "when": "viewItem == taskItem",
+          "command": "aptd.commands.tasks.build",
+          "icon": "$(folder-opened)",
+          "when": "view == aptd.tasks && viewItem != taskItemDisabled",
+          "group": "inline"
+        },
+        {
+          "command": "aptd.commands.tasks.open-sources-folder",
+          "when": "view == aptd.tasks && viewItem == taskItem",
           "group": "navigation-task-item-context"
         }
       ]
-    }
+    },
+     "commands": [
+      {
+        "command": "aptd.commands.tasks.attach-to-process",
+        "title": "Attach to process",
+        "icon": "$(callstack-view-session)"
+      },
+      {
+        "command": "aptd.commands.tasks.build",
+        "title": "Build",
+        "icon": "$(git-stash)"
+      },
+      {
+        "command": "aptd.commands.tasks.open-sources-folder",
+        "title": "Open the task folder"
+      }
+    ],
+
+    "walkthroughs": [
+      {
+        "id": "aptd.walkthrough",
+        "title": "Get started",
+        "description": "This walkthrough can help you to set up the environment to debug your tasks.",
+        "steps": [
+          {
+            "id": "aptd.welcome",
+            "title": "👋 Welcome!",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            }
+          },
+          {
+            "id": "aptd.open-task-folder",
+            "title": "📂 Open Azure Pipelines Tasks repository",
+            "description": "Open the Azure Pipelines Tasks repository folder\n[Open the folder](command:workbench.action.files.openFolder)",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            }
+          },
+          {
+            "id": "aptd.connect-to-organization",
+            "title": "🏢 Connect to your organization",
+            "description": "To debug the tasks you need to connect to one of your organization\n[Connect](command:aptd.walkthrough.connect-to-organization)",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            },
+            "when": "!aptd.walkrhrough.is-authorized"
+          },
+          {
+            "id": "aptd.switch-organization",
+            "title": "🏢 Switch organization",
+            "description": "You can switch between your organization.\n[Switch organization](command:aptd.walkthrough.logout)",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            },
+            "when": "aptd.walkrhrough.is-authorized"
+          },
+          {
+            "id": "aptd.logout",
+            "title": "🏢 Logout from organization",
+            "description": "Feel free to logout from your organization.\n[Logout](command:aptd.walkthrough.logout)",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            },
+            "when": "aptd.walkrhrough.is-authorized"
+          },
+          {
+            "id": "aptd.agent",
+            "title": "🚀 Link your self-hosted agent",
+            "description": "To debug and work with tasks you need to link your [self-hosted agent](https://learn.microsoft.com/en-us/azure/devops/pipelines/agents/agents?view=azure-devops&tabs=yaml%2Cbrowser#self-hosted-agents).\n[Link agent](command:aptd.walkthrough.link-agent)",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            },
+            "when": "!aptd.is-agent-linked"
+          },
+          {
+            "id": "aptd.relink-agent",
+            "title": "✂️ Re-link your self-hosted agent",
+            "description": "You can easily relink the extension to another agent.\n[Relink agent](command:aptd.walkthrough.relink-agent)",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            },
+            "when": "aptd.is-agent-linked"
+          },
+          {
+            "id": "aptd.unlink-agent",
+            "title": "🗑️ Unlink your self-hosted agent",
+            "description": "You can easily unlink the extension to another agent.\n[Unlink agent](command:aptd.walkthrough.unlink-agent)",
+            "media": {
+              "altText": "Welcome to Azure Pipelines Tasks Debugger",
+              "image": "media/walkthrough/welcome/welcome.png"
+            },
+            "when": "aptd.is-agent-linked"
+          }
+        ]
+      }
+    ],
+    "authentication": [
+      {
+        "id": "azuredevopsoauth",
+        "label": "Azure DevOps"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "yarn run package",
@@ -144,12 +192,18 @@
     "lint": "eslint src",
     "test": "vscode-test"
   },
+  "dependencies": {
+    "azure-devops-node-api": "^14.1.0",
+    "undici": "^7.10.0",
+    "uuid": "^11.1.0"
+  },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "22.15.3",
-    "@types/vscode": "^1.99.1",
-    "@typescript-eslint/eslint-plugin": "^8.31.0",
-    "@typescript-eslint/parser": "^8.31.0",
+    "@types/uuid": "^10.0.0",
+    "@types/vscode": "^1.95.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
     "esbuild": "^0.25.3",
