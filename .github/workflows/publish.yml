@@ -30,11 +30,16 @@ jobs:
           yarn global add @vscode/vsce
           vsce package -o ${{ env.extension-name }}
 
+      - name: Get version from package.json
+        id: get_version
+        run: |
+          echo "version=$(node -p \"require('./package.json').version\")" >> $GITHUB_OUTPUT
+
       - name: Create a Release
         id: create_release
         uses: shogo82148/actions-create-release@v1
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: v${{ steps.get_version.outputs.version }}
 
       - name: Upload Extension as Release Asset
         uses: shogo82148/actions-upload-release-asset@v1
