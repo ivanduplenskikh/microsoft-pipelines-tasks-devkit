@@ -2,10 +2,8 @@ name: Build Extension
 
 on:
   workflow_dispatch:
-  push:
-    branches: [master]
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   build:
@@ -24,7 +22,7 @@ jobs:
       - name: Build the extension
         run: yarn compile
 
-      - name: Run test on Linux 
+      - name: Run test on Linux
         run: xvfb-run -a yarn test
         if: runner.os == 'Linux'
 
