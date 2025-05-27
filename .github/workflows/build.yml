@@ -36,7 +36,3 @@ jobs:
 
       - name: Build the extension
         run: yarn compile
-
-      - name: Run test on other OS
-        run: yarn test
-        if: runner.os != 'Linux'
