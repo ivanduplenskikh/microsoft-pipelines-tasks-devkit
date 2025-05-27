@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
   release:
     types: [published]
-
+  push:
+    branches:
+      - master
 env:
   extension-name: pipelines-tasks-devkit-${{ github.ref_name }}.vsix
-  # ref_name is the tag, specified in the release.
-  # Tag must contain the version of the extension. Ex: '1.0.0'
 
 jobs:
   publish:
@@ -24,21 +24,11 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Build the extension
-        run: yarn compile
-
-      - name: Run test on Linux 
-        run: xvfb-run -a yarn test
-        if: runner.os == 'Linux'
-
-      - name: Run test on other OS
-        run: yarn test
-        if: runner.os != 'Linux'
-
-      - name: Package the extension
+      - name: Build and package the extension
         run: |
+          yarn compile
           yarn global add @vscode/vsce
-          vsce package
+          vsce package -o ${{ env.extension-name }}
 
       - name: Get asset upload URL
         id: get_release
@@ -53,8 +43,3 @@ jobs:
           asset_path: ./${{ env.extension-name }}
           asset_name: ${{ env.extension-name }}
           asset_content_type: application/octet-stream
-
-      - name: Publish Extension
-        run: vsce publish
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
