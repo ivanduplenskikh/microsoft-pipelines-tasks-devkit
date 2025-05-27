@@ -33,7 +33,7 @@ jobs:
           yarn compile
           yarn global add @vscode/vsce
           mkdir -p dist/releases
-          vsce package -o dist/releases/aptd-${{ steps.get_version.outputs.version }}.vsix
+          vsce package
 
       - name: Create a Release
         id: create_release
@@ -45,6 +45,4 @@ jobs:
         uses: shogo82148/actions-upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/releases
-          asset_name: aptd-${{ steps.get_version.outputs.version }}.vsix
-          asset_content_type: application/octet-stream
+          asset_path: azure-pipelines-tasks-debugger-${{ steps.get_version.outputs.version }}.vsix
