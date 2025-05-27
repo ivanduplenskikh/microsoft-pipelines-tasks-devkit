@@ -38,20 +38,8 @@ export class TasksProvider implements vscode.TreeDataProvider<TaskItem> {
     return element;
   }
 
-  getChildren(element?: vscode.TreeItem): Promise<vscode.TreeItem[]> {
-    if (!element) {
-      const groups = Array.from(new Set(this.tasks.map(task => task.object.name)));
-      const nameItems = groups.map(name =>
-        new CategoryItem(name, this.tasks.filter(task => task.object.name === name))
-      );
-      return Promise.resolve(nameItems);
-    }
-
-    if (element instanceof CategoryItem) {
-      return Promise.resolve(element.childrenItems);
-    }
-
-    return Promise.resolve([]);
+  getChildren(_element?: TaskItem): vscode.ProviderResult<TaskItem[]> {
+    return this.tasks;
   }
 
   private initTasks(taskRootFolderPath: string) {
@@ -62,6 +50,6 @@ export class TasksProvider implements vscode.TreeDataProvider<TaskItem> {
       this.context.workspaceState.update('tasks', tasksPaths);
     }
 
-    this.items = tasksPaths.map(x => new TaskItem(x, join(taskRootFolderPath, x)));
+    this.tasks = tasksPaths.map(x => new TaskItem(x, join(taskRootFolderPath, x)));
   }
 }
