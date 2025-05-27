@@ -8,6 +8,7 @@
     "vscode": "^1.95.0"
   },
   "license": "MIT",
+  "repository": "github:ivanduplenskikh/microsoft-pipelines-tasks-devkit",
   "icon": "assets/azure-devops.png",
   "galleryBanner": {
     "color": "#1e1e1e",
