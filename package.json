@@ -57,7 +57,7 @@
         {
           "command": "aptd.commands.tasks.build",
           "icon": "$(folder-opened)",
-          "when": "view == aptd.tasks && viewItem == taskItem",
+          "when": "view == aptd.tasks && viewItem != taskItemDisabled",
           "group": "inline"
         },
         {

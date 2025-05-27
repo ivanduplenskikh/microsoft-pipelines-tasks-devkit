@@ -37,6 +37,7 @@ export class TaskItem extends vscode.TreeItem {
 
     if (this.isDisabled) {
       this.iconPath = new vscode.ThemeIcon('circle-slash');
+      this.contextValue = 'taskItemDisabled';
       this.description = 'Not the NodeJS task';
     }
   }
