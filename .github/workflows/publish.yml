@@ -33,6 +33,8 @@ jobs:
       - name: Create a Release
         id: create_release
         uses: shogo82148/actions-create-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
 
       - name: Upload Extension as Release Asset
         uses: shogo82148/actions-upload-release-asset@v1
