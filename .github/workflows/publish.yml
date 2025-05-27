@@ -7,8 +7,6 @@ on:
   push:
     branches:
       - master
-env:
-  extension-name: aptd-${{ github.ref_name }}.vsix
 
 jobs:
   publish:
@@ -24,15 +22,18 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Get version from package.json
+        id: get_version
+        run: |
+          version=$(jq -r '.version' package.json)
+          echo "version=$version" >> $GITHUB_OUTPUT
+
       - name: Build and package the extension
         run: |
           yarn compile
           yarn global add @vscode/vsce
-          vsce package -o ${{ env.extension-name }}
-
-      - name: Get version from package.json
-        id: get_version
-        run: cat package.json | jq .version >> $GITHUB_OUTPUT
+          mkdir -p dist/releases
+          vsce package
 
       - name: Create a Release
         id: create_release
@@ -44,6 +45,4 @@ jobs:
         uses: shogo82148/actions-upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./${{ env.extension-name }}
-          asset_name: ${{ env.extension-name }}
-          asset_content_type: application/octet-stream
+          asset_path: azure-pipelines-tasks-debugger-${{ steps.get_version.outputs.version }}.vsix
