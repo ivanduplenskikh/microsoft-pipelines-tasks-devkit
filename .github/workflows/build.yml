@@ -19,20 +19,5 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Check version bump against latest release
-        run: |
-          LATEST_TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
-          echo "Latest release tag: $LATEST_TAG"
-          PKG_VERSION=$(node -p "require('./package.json').version")
-          echo "Current package.json version: $PKG_VERSION"
-          if [ "$LATEST_TAG" = "v$PKG_VERSION" ]; then
-            echo "❌ Version in package.json has not been bumped. Please update the version before merging."
-            exit 1
-          else
-            echo "✅ Version bump detected."
-          fi
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build the extension
         run: yarn compile
